@@ -1,6 +1,12 @@
 *.class
 *.log
 
+# platform specific gdx libs automatically downloaded by sbt
+ios/libs/ios
+gdx*.jar
+libandroidgl20.so
+libgdx.so
+
 # sbt specific
 dist/*
 target/
