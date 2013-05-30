@@ -1,4 +1,4 @@
-package com.pkukielka.stronghold-defense
+package com.pkukielka.stronghold
 
 import android.os.Bundle
 import com.badlogic.gdx.backends.android._

@@ -1,4 +1,4 @@
-package com.pkukielka.stronghold-defense
+package com.pkukielka.stronghold
 
 import com.badlogic.gdx.Game
 

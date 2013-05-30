@@ -5,9 +5,9 @@ using System.Linq;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using com.badlogic.gdx.backends.ios;
-using com.pkukielka.stronghold-defense;
+using com.pkukielka.stronghold;
 
-namespace com.pkukielka.stronghold-defense
+namespace com.pkukielka.stronghold
 {		
 	public class Application
 	{
