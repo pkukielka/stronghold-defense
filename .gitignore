@@ -1,7 +1,8 @@
 *.class
 *.log
 
-# platform specific gdx libs automatically downloaded by sbt
+# platform specific libs automatically downloaded by sbt
+scala-library.jar
 ios/libs/ios
 gdx*.jar
 libandroidgl20.so
@@ -20,3 +21,6 @@ project/plugins/project/
 
 # IntelliJ project files
 .idea*
+
+# Proguard
+android/proguard_logs/*
