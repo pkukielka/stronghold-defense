@@ -24,3 +24,7 @@ project/plugins/project/
 
 # Proguard
 android/proguard_logs/*
+
+build-log.xml
+desktop/data/
+common/src/main/resources/data/maps/*.bin
