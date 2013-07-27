@@ -15,6 +15,7 @@ object PathFinder {
 }
 
 class PathFinder(map: MapBuilder, influencesManager: InfluencesManager) {
+
   import PathFinder._
 
   private val distances = Array.fill[Distance](map.nodesCount)(inf)
@@ -30,9 +31,9 @@ class PathFinder(map: MapBuilder, influencesManager: InfluencesManager) {
     val maxY = map.height - 1
 
     side match {
-      case 0 => if (hasConnections(x, 0)    && map.heights(x)(0).isGroundLevel)    return new Vector3(x, 0, 0)
+      case 0 => if (hasConnections(x, 0) && map.heights(x)(0).isGroundLevel) return new Vector3(x, 0, 0)
       case 1 => if (hasConnections(x, maxY) && map.heights(x)(maxY).isGroundLevel) return new Vector3(x, maxY, 0)
-      case 2 => if (hasConnections(0, y)    && map.heights(0)(y).isGroundLevel)    return new Vector3(0, y, 0)
+      case 2 => if (hasConnections(0, y) && map.heights(0)(y).isGroundLevel) return new Vector3(0, y, 0)
       case 3 => if (hasConnections(maxX, y) && map.heights(maxX)(y).isGroundLevel) return new Vector3(maxX, y, 0)
     }
 

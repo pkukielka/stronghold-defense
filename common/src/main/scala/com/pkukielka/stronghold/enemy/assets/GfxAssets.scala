@@ -1,11 +1,11 @@
-package com.pkukielka.stronghold.enemy
+package com.pkukielka.stronghold.enemy.assets
 
 import com.badlogic.gdx.graphics.g2d.{Animation, TextureAtlas}
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
 import scala.collection.convert.WrapAsScala.asScalaIterator
 
-object EnemyGfx {
+object GfxAssets {
   val moveAtlas = new TextureAtlas(Gdx.files.internal("data/textures/enemies/enemies_move.atlas"))
   val dieAtlas = new TextureAtlas(Gdx.files.internal("data/textures/enemies/enemies_die.atlas"))
 
@@ -24,7 +24,7 @@ object EnemyGfx {
   }
 }
 
-class EnemyGfx(name: String, frameDuration: Float) {
-  val dieAnimations = EnemyGfx.createDieAnimations(name, frameDuration)
-  val moveAnimations = EnemyGfx.createMoveAnimations(name, frameDuration)
+class GfxAssets(name: String, frameDuration: Float) {
+  val dieAnimations = GfxAssets.createDieAnimations(name, frameDuration)
+  val moveAnimations = GfxAssets.createMoveAnimations(name, frameDuration)
 }
