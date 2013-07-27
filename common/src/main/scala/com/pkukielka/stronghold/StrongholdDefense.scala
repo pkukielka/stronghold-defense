@@ -7,8 +7,7 @@ import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer
 import com.badlogic.gdx.input.GestureDetector
 import scala.language.implicitConversions
-import scala.collection.convert.WrapAsScala.asScalaIterator
-import com.pkukielka.stronghold.enemies._
+import com.pkukielka.stronghold.enemy._
 
 class StrongholdDefense extends Game {
 
@@ -18,7 +17,7 @@ class StrongholdDefense extends Game {
   private var font: BitmapFont = null
   private var batch: SpriteBatch = null
 
-  private var animationManager: AttackersAnimationManager = null
+  private var animationManager: AnimationManager = null
 
   override def create {
     camera = new OrthographicCamera
@@ -31,7 +30,7 @@ class StrongholdDefense extends Game {
     map = new TmxMapLoader().load("data/maps/test.tmx")
     renderer = new IsometricTiledMapRenderer(map, 1f / 64f)
 
-    animationManager = new AttackersAnimationManager(camera, map, "test")
+    animationManager = new AnimationManager(camera, map, "test")
 
     val inputCamController = new InputCamController(camera)
     val gestureCamController = new GestureDetector(new GestureCamController(camera, map, animationManager.hit))
