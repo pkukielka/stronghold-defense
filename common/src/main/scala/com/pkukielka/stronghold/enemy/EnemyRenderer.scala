@@ -1,11 +1,12 @@
 package com.pkukielka.stronghold.enemy
 
-import com.badlogic.gdx.graphics.g2d.{SpriteBatch, TextureRegion}
+import com.badlogic.gdx.graphics.g2d.{ParticleEffectPool, SpriteBatch, TextureRegion}
 import com.pkukielka.stronghold.IsometricMapUtils
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.Color
+import com.pkukielka.stronghold.effect.FireEffect
 
-object EnemyModel {
+object EnemyRenderer {
 
   object lifeBar {
     val width = 0.4f
@@ -16,18 +17,18 @@ object EnemyModel {
 
 }
 
-class EnemyModel(enemy: Enemy) {
-
-  import enemy._
+trait EnemyRenderer {
+  self: Enemy =>
 
   val unitScale = 1 / 96f
+  var fireEffect: ParticleEffectPool#PooledEffect = null
 
   def currentFrame: TextureRegion = {
-    if (enemy.isDead) {
-      assets.gfx.dieAnimations(enemy.angle).getKeyFrame(enemy.animationTime, false)
+    if (isDead) {
+      assets.gfx.dieAnimations(angle).getKeyFrame(animationTime, false)
     }
     else {
-      assets.gfx.moveAnimations(enemy.angle).getKeyFrame(enemy.animationTime, true)
+      assets.gfx.moveAnimations(angle).getKeyFrame(animationTime, true)
     }
   }
 
@@ -36,15 +37,24 @@ class EnemyModel(enemy: Enemy) {
   def height: Float = currentFrame.getRegionHeight * unitScale
 
   def isHit(xScreen: Float, yScreen: Float, utils: IsometricMapUtils): Boolean = {
-    val pos = utils.getScreenCoordinates(enemy.position.x, position.y)
+    val pos = utils.mapToCameraCoordinates(position.x, position.y)
     pos.x <= xScreen && pos.x + width >= xScreen && pos.y <= yScreen && pos.y + height >= yScreen
   }
 
-  def drawLifeBar(shapeRenderer: ShapeRenderer, utils: IsometricMapUtils) {
-    import EnemyModel.lifeBar
+  def setOnFire(time: Float) {
+    if (fireEffect == null) {
+      fireEffect = FireEffect.obtain
+    }
 
-    if (!enemy.isDead && life != maxLife) {
-      val pos = utils.getScreenCoordinates(enemy.position.x, position.y)
+    fireEffect.setDuration((time * 1000).toInt)
+    fireEffect.reset
+  }
+
+  def drawLifeBar(shapeRenderer: ShapeRenderer, utils: IsometricMapUtils) {
+    import EnemyRenderer.lifeBar
+
+    if (!isDead && life != maxLife) {
+      val pos = utils.mapToCameraCoordinates(position.x, position.y)
       val x = pos.x + (width - 0.5f) / 2
       val y = pos.y + height + lifeBar.distance
       val lifeRatio = life.toFloat / maxLife
@@ -56,9 +66,20 @@ class EnemyModel(enemy: Enemy) {
     }
   }
 
-  def drawModel(batch: SpriteBatch, utils: IsometricMapUtils) {
-    val pos = utils.getScreenCoordinates(enemy.position.x, position.y)
+  def drawModel(batch: SpriteBatch, deltaTime: Float, utils: IsometricMapUtils) {
+    val pos = utils.mapToCameraCoordinates(position.x, position.y)
     batch.draw(currentFrame, pos.x, pos.y, width, height)
+
+    if (fireEffect != null) {
+      if (fireEffect.isComplete) {
+        fireEffect.free()
+        fireEffect = null
+      }
+      else {
+        fireEffect.setPosition(pos.x + width * 0.5f, pos.y + height * 0.5f)
+        fireEffect.draw(batch, deltaTime)
+      }
+    }
   }
 
 }

@@ -1,6 +1,6 @@
 package com.pkukielka.stronghold.enemy
 
-import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.math.Vector2
 import scala.Array
 import scala.annotation.tailrec
 import scala.collection.mutable
@@ -20,10 +20,10 @@ class PathFinder(map: MapBuilder, influencesManager: InfluencesManager) {
 
   private val distances = Array.fill[Distance](map.nodesCount)(inf)
   private val queue = mutable.PriorityQueue.empty[NodeWithPriority]
-  val target = new Vector3()
+  val target = new Vector2()
 
   @tailrec
-  final def getFreePosition(): Vector3 = {
+  final def getFreePosition(): Vector2 = {
     val side = (Math.random() * 4).toInt
     val x = (Math.random() * 29.0f).toInt
     val y = (Math.random() * 29.0f).toInt
@@ -31,10 +31,10 @@ class PathFinder(map: MapBuilder, influencesManager: InfluencesManager) {
     val maxY = map.height - 1
 
     side match {
-      case 0 => if (hasConnections(x, 0) && map.heights(x)(0).isGroundLevel) return new Vector3(x, 0, 0)
-      case 1 => if (hasConnections(x, maxY) && map.heights(x)(maxY).isGroundLevel) return new Vector3(x, maxY, 0)
-      case 2 => if (hasConnections(0, y) && map.heights(0)(y).isGroundLevel) return new Vector3(0, y, 0)
-      case 3 => if (hasConnections(maxX, y) && map.heights(maxX)(y).isGroundLevel) return new Vector3(maxX, y, 0)
+      case 0 => if (hasConnections(x, 0) && map.heights(x)(0).isGroundLevel) return new Vector2(x, 0)
+      case 1 => if (hasConnections(x, maxY) && map.heights(x)(maxY).isGroundLevel) return new Vector2(x, maxY)
+      case 2 => if (hasConnections(0, y) && map.heights(0)(y).isGroundLevel) return new Vector2(0, y)
+      case 3 => if (hasConnections(maxX, y) && map.heights(maxX)(y).isGroundLevel) return new Vector2(maxX, y)
     }
 
     getFreePosition
@@ -44,9 +44,9 @@ class PathFinder(map: MapBuilder, influencesManager: InfluencesManager) {
 
   def getInfluence(node: Node) = influencesManager.getSum(node2posX(node), node2posY(node))
 
-  def getNextStep(currentPosition: Vector3): Node = map.edges(getNode(currentPosition)).minBy(distances(_))
+  def getNextStep(currentPosition: Vector2): Node = map.edges(getNode(currentPosition)).minBy(distances(_))
 
-  def getNode(position: Vector3): Node = getNode(position.x.toInt, position.y.toInt)
+  def getNode(position: Vector2): Node = getNode(position.x.toInt, position.y.toInt)
 
   def getNode(x: Int, y: Int): Node = y * map.width + x
 
@@ -58,7 +58,7 @@ class PathFinder(map: MapBuilder, influencesManager: InfluencesManager) {
     for (i <- distances.indices) distances(i) = inf
     distances(destination) = 0
 
-    target.set(node2posX(destination), node2posY(destination), 0)
+    target.set(node2posX(destination), node2posY(destination))
 
     queue.enqueue(destination)
 

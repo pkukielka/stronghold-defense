@@ -1,18 +1,18 @@
 package com.pkukielka.stronghold
 
-import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.math.Vector2
 import scala.collection.mutable.ArrayBuffer
 import com.badlogic.gdx.utils.Pool.Poolable
 import com.badlogic.gdx.utils.Pool
 
 class Influence() extends Poolable {
   var endTime: Float = 0.0f
-  val center: Vector3 = new Vector3()
+  val center: Vector2 = new Vector2()
   var valueCenter: Float = 0.0f
   var valueEdge: Float = 0.0f
   var range: Float = 0.0f
 
-  def init(endTime: Float, center: Vector3, valueCenter: Float, valueEdge: Float, range: Float) {
+  def init(endTime: Float, center: Vector2, valueCenter: Float, valueEdge: Float, range: Float) {
     this.endTime = endTime
     this.center.set(center)
     this.valueCenter = valueCenter
@@ -22,7 +22,7 @@ class Influence() extends Poolable {
 
   def reset() {
     endTime = 0.0f
-    center.set(0.0f, 0.0f, 0.0f)
+    center.set(0.0f, 0.0f)
     valueCenter = 0.0f
     valueEdge = 0.0f
     range = 0.0f
@@ -30,7 +30,7 @@ class Influence() extends Poolable {
 }
 
 class InfluencesManager(width: Int, height: Int) {
-  val influencesFiled = Array.fill(width, height)(0)
+  val influencesField = Array.fill(width, height)(0)
   val influences = ArrayBuffer.empty[Influence]
   var currentTime = 0.0f
 
@@ -38,7 +38,7 @@ class InfluencesManager(width: Int, height: Int) {
     def newObject(): Influence = new Influence()
   }
 
-  def add(duration: Float, center: Vector3, valueCenter: Float, valueEdge: Float, range: Float): Influence = {
+  def add(duration: Float, center: Vector2, valueCenter: Float, valueEdge: Float, range: Float): Influence = {
     val influence = influencesPool.obtain()
     influence.init(currentTime + duration, center, valueCenter, valueEdge, range)
     updateField(influence, influence.valueCenter, influence.valueEdge)
@@ -57,15 +57,15 @@ class InfluencesManager(width: Int, height: Int) {
       x <- 0 until width
       y <- 0 until height
     } {
-      val distance = influence.center.dst(x, y, 0f)
+      val distance = influence.center.dst(x, y)
       if (distance <= influence.range) {
         val ratio = distance / influence.range
-        influencesFiled(x)(y) += ((1 - ratio) * valueCenter + ratio * valueEdge).toInt
+        influencesField(x)(y) += ((1 - ratio) * valueCenter + ratio * valueEdge).toInt
       }
     }
   }
 
-  def getSum(x: Int, y: Int): Int = influencesFiled(x)(y)
+  def getSum(x: Int, y: Int): Int = influencesField(x)(y)
 
   def update(deltaTime: Float) {
     currentTime += deltaTime

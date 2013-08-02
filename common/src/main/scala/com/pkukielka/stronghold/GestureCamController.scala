@@ -15,7 +15,7 @@ class GestureCamController(val camera: OrthographicCamera, val map: TiledMap, va
   }
 
   override def tap(x: Float, y: Float, count: Int, button: Int): Boolean = {
-    val tilePosition = utils.getTilePosition(x, y)
+    val tilePosition = utils.screenToCameraCoordinates(x, y)
     onTap(tilePosition.x, tilePosition.y)
     false
   }
