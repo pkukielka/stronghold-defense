@@ -21,7 +21,7 @@ class FireArrow extends Arrow {
   override def drawSpecialEffects(batch: SpriteBatch) {
     if (isFireActive)
     {
-      if (fireEffect.isComplete()) {
+      if (fireEffect.isComplete) {
         fireEffect.free()
         isFireActive = false
       }

@@ -2,9 +2,9 @@ package com.pkukielka.stronghold.enemy
 
 import com.badlogic.gdx.math.Vector2
 import scala.language.implicitConversions
-import com.pkukielka.stronghold.enemy.assets.Assets
+import com.pkukielka.stronghold.assets.Assets
 
-abstract class Enemy(val assets: Assets, pathFinder: PathFinder) extends EnemyRenderer {
+abstract class Enemy(pathFinder: PathFinder) extends EnemyRenderer {
   var animationTime = Math.random().toFloat
   var xOffset = (0.5f + (Math.random() - 0.5f) / 4).toFloat
   var yOffset = (0.5f + (Math.random() - 0.5f) / 4).toFloat
@@ -17,6 +17,8 @@ abstract class Enemy(val assets: Assets, pathFinder: PathFinder) extends EnemyRe
     var timeLeft = 0f
     var damagePerSecond = 0f
   }
+
+  def assets: Assets
 
   def maxLife: Float = 100f
 

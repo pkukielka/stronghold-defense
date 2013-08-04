@@ -4,7 +4,7 @@ import com.badlogic.gdx.input.GestureDetector.GestureAdapter
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.maps.tiled.TiledMap
 
-class GestureCamController(val camera: OrthographicCamera, val map: TiledMap, val onTap: (Float, Float) => Unit)
+class GestureCamController(val camera: OrthographicCamera, val onTap: (Float, Float) => Unit)
   extends GestureAdapter {
   var initialScale = 1f
   val utils = new IsometricMapUtils(camera)

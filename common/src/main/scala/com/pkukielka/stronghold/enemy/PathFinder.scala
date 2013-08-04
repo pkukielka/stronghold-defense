@@ -23,7 +23,7 @@ class PathFinder(map: MapBuilder, influencesManager: InfluencesManager) {
   val target = new Vector2()
 
   @tailrec
-  final def getFreePosition(): Vector2 = {
+  final def getFreePosition: Vector2 = {
     val side = (Math.random() * 4).toInt
     val x = (Math.random() * 29.0f).toInt
     val y = (Math.random() * 29.0f).toInt

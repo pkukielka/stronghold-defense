@@ -32,7 +32,7 @@ class Arrow extends Bullet {
 
     val distance = position.dst(target)
     val currentMiss = (distance / maxRange) * maxMiss
-    val heightAddition = ((distance / maxRange) * distance * 0.5f)
+    val heightAddition = (distance / maxRange) * distance * 0.5f
 
     start.set(position)
     target.add(((0.5 - Math.random()) * currentMiss).toFloat, ((0.5 - Math.random()) * currentMiss).toFloat)

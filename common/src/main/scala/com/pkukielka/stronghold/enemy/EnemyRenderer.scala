@@ -47,7 +47,7 @@ trait EnemyRenderer {
     }
 
     fireEffect.setDuration((time * 1000).toInt)
-    fireEffect.reset
+    fireEffect.reset()
   }
 
   def drawLifeBar(shapeRenderer: ShapeRenderer, utils: IsometricMapUtils) {

@@ -1,10 +1,10 @@
 package com.pkukielka.stronghold.enemy.units
 
 import com.pkukielka.stronghold.enemy.{PathFinder, Enemy}
-import com.pkukielka.stronghold.enemy.assets.Assets
+import com.pkukielka.stronghold.assets.Assets
 
-object Minotaur extends Assets("minotaur", 0.10f)
+class Minotaur(implicit pathFinder: PathFinder) extends Enemy(pathFinder) {
+  override def assets = Assets.minotaur
 
-class Minotaur(implicit pathFinder: PathFinder) extends Enemy(Minotaur, pathFinder) {
   override def velocity: Float = 1.4f
 }

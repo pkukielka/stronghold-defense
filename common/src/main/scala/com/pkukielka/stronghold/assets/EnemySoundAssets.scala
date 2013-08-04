@@ -1,8 +1,8 @@
-package com.pkukielka.stronghold.enemy.assets
+package com.pkukielka.stronghold.assets
 
 import com.badlogic.gdx.Gdx
 
-class SoundAssets(name: String) {
+class EnemySoundAssets(name: String) {
   val hit = loadSound(name + "_hit")
   val die = loadSound(name + "_die")
   val ment = loadSound(name + "_ment")
