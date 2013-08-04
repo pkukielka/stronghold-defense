@@ -44,18 +44,17 @@ class PathFinder(map: MapBuilder, influencesManager: InfluencesManager) {
 
   def getInfluence(node: Node) = influencesManager.getSum(node2posX(node), node2posY(node))
 
+
   def getNextStep(currentPosition: Vector2): Node = {
-    val edges = map.edges(getNode(currentPosition))
-    var closestNode = edges.head
-    var i = 0
-    while (i < edges.length) {
-      if (distances(edges(i)) < distances(closestNode)) {
-        closestNode = edges(i)
+    @tailrec
+    def findClosestNode(edges: mutable.MutableList[Node], closestNode: Node): Node = {
+      if (edges.isEmpty) {
+        return closestNode
       }
-      i += 1
+      findClosestNode(edges.tail, if (distances(edges.head) < distances(closestNode)) edges.head else closestNode)
     }
-    closestNode
-    //map.edges(getNode(currentPosition)).minBy(distances(_))
+
+    findClosestNode(map.edges(getNode(currentPosition)).tail, map.edges(getNode(currentPosition)).head)
   }
 
   def getNode(position: Vector2): Node = getNode(position.x.toInt, position.y.toInt)

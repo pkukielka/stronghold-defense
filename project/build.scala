@@ -8,6 +8,7 @@ object Settings {
   lazy val common = Defaults.defaultSettings ++ Seq(
     version := "0.1",
     scalaVersion := "2.10.1",
+    scalacOptions += "-optimize",
     libraryDependencies += "com.assembla.scala-incubator" % "graph-core_2.10" % "1.6.1",
     updateLibsTask
   )
