@@ -68,7 +68,7 @@ abstract class Enemy(pathFinder: PathFinder) extends EnemyRenderer {
   }
 
   def update(deltaTime: Float) {
-    if (deltaTime < 0.05) {
+    if (deltaTime < 0.10) {
       animationTime += deltaTime
 
       if (OnFire.isActive) {
