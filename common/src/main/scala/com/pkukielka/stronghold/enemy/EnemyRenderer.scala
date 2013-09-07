@@ -57,7 +57,7 @@ trait EnemyRenderer {
       val pos = utils.mapToCameraCoordinates(position.x, position.y)
       val x = pos.x + (width - 0.5f) / 2
       val y = pos.y + height + lifeBar.distance
-      val lifeRatio = life.toFloat / maxLife
+      val lifeRatio = life / maxLife
 
       shapeRenderer.setColor(Color.BLACK)
       shapeRenderer.rect(x, y, lifeBar.width, lifeBar.height)

@@ -29,7 +29,7 @@ class StrongholdDefense extends Game {
     camera.update()
 
     font = new BitmapFont()
-    batch = new SpriteBatch()
+    batch = new SpriteBatch(1100)
 
     map = new TmxMapLoader().load("data/maps/test.tmx")
     renderer = new IsometricTiledMapRenderer(map, 1f / 64f)

@@ -64,48 +64,56 @@ class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: Strin
 
     influencesManager.update(delta)
 
-    enemies.foreach(_.update(delta))
+    for (enemy <- enemies) {
+      enemy.update(delta)
+    }
 
-    bullets.foreach {
-      bullet =>
-        bullet.update(delta)
+    for (bullet <- bullets) {
+      bullet.update(delta)
 
-        if (!bullet.isCompleted) {
-          enemies.foreach {
-            enemy =>
-              if (!enemy.isDead && enemy.isHit(bullet.position.x, bullet.position.y, utils)) {
-                enemy.hit((30 + Math.random() * 50).toInt)
-                if (bullet.isInstanceOf[FireArrow]) {
-                  enemy.setOnFire(1 + Math.random().toFloat * 4, 20)
-                }
-                if (enemy.isDead) {
-                  influencesManager.add(10000f, enemy.position, 1000f, 200, 3f)
-                  updatePath()
-                }
-              }
+      if (!bullet.isCompleted) {
+        for (enemy <- enemies if !enemy.isDead && enemy.isHit(bullet.position.x, bullet.position.y, utils)) {
+          enemy.hit((30 + Math.random() * 50).toInt)
+          if (bullet.isInstanceOf[FireArrow]) {
+            enemy.setOnFire(1 + Math.random().toFloat * 4, 20)
+          }
+          if (enemy.isDead) {
+            influencesManager.add(10000f, enemy.position, 1000f, 200, 3f)
+            updatePath()
           }
         }
+      }
     }
 
     batch.begin()
-    enemies.filter(_.isDead).foreach(_.drawModel(batch, delta, utils))
+    for (enemy <- enemies if enemy.isDead) {
+      enemy.drawModel(batch, delta, utils)
+    }
     batch.end()
 
     batch.begin()
-    bullets.filter(_.isCompleted).foreach(_.draw(batch))
+    for (bullet <- bullets if bullet.isCompleted) {
+      bullet.draw(batch)
+    }
     batch.end()
 
     batch.begin()
-    enemies.filter(!_.isDead).foreach(_.drawModel(batch, delta, utils))
+    for (enemy <- enemies if !enemy.isDead) {
+      enemy.drawModel(batch, delta, utils)
+    }
     batch.end()
 
     batch.begin()
-    bullets.filter(!_.isCompleted).foreach(_.draw(batch))
+    for (bullet <- bullets if !bullet.isCompleted) {
+      bullet.draw(batch)
+    }
     batch.end()
 
     shapeRenderer.setProjectionMatrix(camera.combined)
     shapeRenderer.begin(ShapeType.Filled)
-    enemies.foreach(_.drawLifeBar(shapeRenderer, utils))
+    for (enemy <- enemies) {
+      enemy.drawLifeBar(shapeRenderer, utils)
+    }
     shapeRenderer.end()
   }
 }

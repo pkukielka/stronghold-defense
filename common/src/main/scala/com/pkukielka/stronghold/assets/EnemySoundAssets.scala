@@ -1,13 +1,32 @@
 package com.pkukielka.stronghold.assets
 
-import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.audio.Sound
+import com.badlogic.gdx.assets.AssetManager
 
 class EnemySoundAssets(name: String) {
-  val hit = loadSound(name + "_hit")
-  val die = loadSound(name + "_die")
-  val ment = loadSound(name + "_ment")
-  val phys = loadSound(name + "_phys")
-  val criticDie = loadSound(name + "_critdie")
+  val enemiesSoundsDir = "data/sound/enemies/"
 
-  def loadSound(name: String) = Gdx.audio.newSound(Gdx.files.internal("data/sound/enemies/" + name + ".ogg"))
+  var hit: Sound = _
+  var die: Sound = _
+  var ment: Sound = _
+  var phys: Sound = _
+  var criticDie: Sound = _
+
+  def load(assetManager: AssetManager) {
+    Array("hit", "die", "ment", "phys", "critdie").foreach{
+      sound =>
+        assetManager.load(enemiesSoundsDir + name + "_" + sound + ".ogg", classOf[Sound])
+    }
+  }
+
+  def cache(assetManager: AssetManager) {
+    def getSound(soundType: String) =
+      assetManager.get(enemiesSoundsDir + name + "_" + soundType + ".ogg", classOf[Sound])
+
+    hit = getSound("hit")
+    die = getSound("die")
+    ment = getSound("ment")
+    phys = getSound("phys")
+    criticDie = getSound("critdie")
+  }
 }

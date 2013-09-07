@@ -53,14 +53,14 @@ class MapBuilder(map: TiledMap) {
   }
 
   private def updateNodeHeightMap(x: Int, y: Int) {
-    val cellsColumnProperties = map.getLayers.iterator().toList
+    val cellsColumnProperties = map.getLayers.iterator().toList.view
       .map(_.asInstanceOf[TiledMapTileLayer].getCell(x, y))
       .filterNot(_ == null)
       .map(_.getTile.getProperties)
       .filterNot(isPropertySet(_, "isIgnored"))
 
     if (cellsColumnProperties.lastOption.exists(isPropertySet(_, "isEnterable"))) {
-      heights(x)(y) = cellsColumnProperties
+      heights(x)(y) = cellsColumnProperties.view
         .map(getProperty(_, "heightMap"))
         .filterNot(_ == null)
         .map(_.toCharArray.map(_.toString).map(Integer.parseInt(_)))

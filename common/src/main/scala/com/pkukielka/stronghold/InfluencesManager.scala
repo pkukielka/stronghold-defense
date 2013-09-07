@@ -69,6 +69,8 @@ class InfluencesManager(width: Int, height: Int) {
 
   def update(deltaTime: Float) {
     currentTime += deltaTime
-    influences.filter(_.endTime < currentTime).foreach(remove)
+    for (influence <- influences if influence.endTime < currentTime) {
+      remove(influence)
+    }
   }
 }
