@@ -1,7 +1,7 @@
 package com.pkukielka.stronghold.tower.effects
 
 import com.badlogic.gdx.graphics.g2d.{Sprite, SpriteBatch}
-import com.badlogic.gdx.math.{Vector2, Bezier}
+import com.badlogic.gdx.math._
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.Gdx
 import com.pkukielka.stronghold.tower.Effect
@@ -23,32 +23,32 @@ object Arrow {
 
 class Arrow extends Effect {
   val position: Vector2 = new Vector2()
-  val target: Vector2 = new Vector2()
+  val previousPosition = new Vector2()
   var heightsDifference: Float = 0f
-
-  val start: Vector2 = new Vector2()
-  val middle: Vector2 = new Vector2()
   val direction: Vector2 = new Vector2()
   val path = new Bezier[Vector2]
-  var angle = 0f
   var time = 0f
   var timeToComplete = 0f
+
+  object temp {
+    val middle: Vector2 = new Vector2()
+    val target: Vector2 = new Vector2()
+  }
 
   import Arrow._
 
   def init(xStart: Float, yStart: Float, xEnd: Float, yEnd: Float, heightsDifference: Float) {
     position.set(xStart, yStart)
-    target.set(xEnd, yEnd)
+    temp.target.set(xEnd, yEnd)
     this.heightsDifference = heightsDifference
 
-    val distance = position.dst(target)
+    val distance = position.dst(temp.target)
     val currentMiss = (distance / maxRange) * maxMiss
     val heightAddition = (distance / maxRange) * distance * 0.5f
 
-    start.set(position)
-    target.add(((0.5 - Math.random()) * currentMiss).toFloat, ((0.5 - Math.random()) * currentMiss).toFloat)
-    middle.set(position).add(target).scl(0.5f).add(0, heightAddition)
-    path.set(start, middle, target)
+    temp.target.add(((0.5 - Math.random()) * currentMiss).toFloat, ((0.5 - Math.random()) * currentMiss).toFloat)
+    temp.middle.set(position).add(temp.target).scl(0.5f).add(0, heightAddition)
+    path.set(position, temp.middle, temp.target)
 
     time = 0f
     timeToComplete = distance / velocity
@@ -56,27 +56,30 @@ class Arrow extends Effect {
 
   def isCompleted = time == timeToComplete
 
-  def isEnemyHit(enemy: Enemy): Boolean = {
-    val pos = IsometricMapUtils.mapToCameraCoordinates(enemy.position.x, enemy.position.y)
-    pos.x <= position.x && pos.x + enemy.width >= position.x && pos.y <= position.y && pos.y + enemy.height >= position.y
+  private def angle = Math.toDegrees(Math.atan2(direction.y, direction.x)).toFloat
+
+  private def updatePosition() = {
+    previousPosition.set(position)
+    path.valueAt(position, time / timeToComplete)
+    direction.set(position).sub(previousPosition).nor()
+  }
+
+  private def updateWorldState(enemies: Array[Enemy], pathFinder: PathFinder): Unit = {
+    for (enemy <- enemies if !enemy.isDead && enemy.isHit(previousPosition, position)) {
+      enemy.hit((baseDamage + Math.random() * randomDamage).toInt)
+      if (enemy.isDead) {
+        pathFinder.influencesManager.add(10000f, enemy.position, 1000f, 200, 3f)
+        pathFinder.update
+      }
+      return
+    }
   }
 
   def update(deltaTime: Float, enemies: Array[Enemy], pathFinder: PathFinder) {
     if (!isCompleted) {
       time = (time + deltaTime).min(timeToComplete)
-      direction.set(position)
-      path.valueAt(position, time / timeToComplete)
-      direction.sub(position).nor().scl(-1, -1)
-      angle = Math.toDegrees(Math.atan2(direction.y, direction.x)).toFloat
-
-      for (enemy <- enemies if !enemy.isDead && isEnemyHit(enemy)) {
-        enemy.hit((baseDamage + Math.random() * randomDamage).toInt)
-        if (enemy.isDead) {
-          pathFinder.influencesManager.add(10000f, enemy.position, 1000f, 200, 3f)
-          pathFinder.update
-        }
-      }
-
+      updatePosition()
+      updateWorldState(enemies, pathFinder)
     }
   }
 

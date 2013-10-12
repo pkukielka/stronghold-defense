@@ -20,7 +20,7 @@ class FireArrow extends Arrow {
     }
 
     if (!isCompleted) {
-      for (enemy <- enemies if !enemy.isDead && isEnemyHit(enemy)) {
+      for (enemy <- enemies if !enemy.isDead && enemy.isHit(previousPosition, position)) {
         enemy.setOnFire(1 + Math.random().toFloat * 4, 20)
       }
     }

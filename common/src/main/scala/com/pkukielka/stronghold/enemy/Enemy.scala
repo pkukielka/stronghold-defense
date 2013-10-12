@@ -1,14 +1,15 @@
 package com.pkukielka.stronghold.enemy
 
-import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.{Intersector, Vector2}
 import scala.language.implicitConversions
 import com.pkukielka.stronghold.assets.EnemyAssets
+import com.pkukielka.stronghold.IsometricMapUtils
 
 abstract class Enemy(pathFinder: PathFinder) extends EnemyRenderer {
   var animationTime = Math.random().toFloat
   var xOffset = (0.5f + (Math.random() - 0.5f) / 4).toFloat
   var yOffset = (0.5f + (Math.random() - 0.5f) / 4).toFloat
-  var position = pathFinder.getFreePosition.add(xOffset, yOffset)
+  val position = pathFinder.getFreePosition.add(xOffset, yOffset)
   var directionVector = new Vector2()
   var life = maxLife
 
@@ -16,6 +17,10 @@ abstract class Enemy(pathFinder: PathFinder) extends EnemyRenderer {
     var isActive = false
     var timeLeft = 0f
     var damagePerSecond = 0f
+  }
+
+  object temp {
+    val p1, p2, intersection = new Vector2()
   }
 
   def assets: EnemyAssets
@@ -33,6 +38,21 @@ abstract class Enemy(pathFinder: PathFinder) extends EnemyRenderer {
     OnFire.timeLeft = time
     OnFire.damagePerSecond = damagePerSecond
     setOnFire(time)
+  }
+
+  private def isIntersectingPath(segmentStart: Vector2, segmentEnd: Vector2, p1x: Float, p1y: Float, p2x: Float, p2y: Float) = {
+    temp.p1.set(p1x, p1y)
+    temp.p2.set(p2x, p2y)
+    Intersector.intersectSegments(segmentStart, segmentEnd, temp.p1, temp.p2, temp.intersection)
+  }
+
+  def isHit(segmentStart: Vector2, segmentEnd: Vector2): Boolean = {
+    val pos = IsometricMapUtils.mapToCameraCoordinates(position.x, position.y)
+
+    isIntersectingPath(segmentStart, segmentEnd, pos.x, pos.y, pos.x + width, pos.y) ||
+      isIntersectingPath(segmentStart, segmentEnd, pos.x, pos.y, pos.x, pos.y + height) ||
+      isIntersectingPath(segmentStart, segmentEnd, pos.x + width, pos.y, pos.x + width, pos.y + height) ||
+      isIntersectingPath(segmentStart, segmentEnd, pos.x, pos.y + height, pos.x + width, pos.y + height)
   }
 
   def hit(damage: Float) {
@@ -60,7 +80,7 @@ abstract class Enemy(pathFinder: PathFinder) extends EnemyRenderer {
     position.add(directionVector)
 
     if (position.epsilonEquals(pathFinder.target, 1f)) {
-      position = pathFinder.getFreePosition
+      position.set(pathFinder.getFreePosition)
       if (Math.random() > 0.95) {
         assets.sound.ment.play()
       }
