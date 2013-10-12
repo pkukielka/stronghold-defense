@@ -14,8 +14,8 @@ class EnemyGfxAssets(name: String, frameDuration: Float) {
   var moveAnimations: Array[Animation] = _
 
   def load(assetManager: AssetManager) {
-      assetManager.load(enemiesMoveAtlas, classOf[TextureAtlas])
-      assetManager.load(enemiesDieAtlas, classOf[TextureAtlas])
+    assetManager.load(enemiesMoveAtlas, classOf[TextureAtlas])
+    assetManager.load(enemiesDieAtlas, classOf[TextureAtlas])
   }
 
   def cache(assetManager: AssetManager) {

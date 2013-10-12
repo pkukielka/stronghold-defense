@@ -2,7 +2,6 @@ package com.pkukielka.stronghold
 
 import com.badlogic.gdx.input.GestureDetector.GestureAdapter
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.maps.tiled.TiledMap
 
 class GestureCamController(val camera: OrthographicCamera, val onTap: (Float, Float) => Unit)
   extends GestureAdapter {

@@ -5,6 +5,7 @@ import com.pkukielka.stronghold.IsometricMapUtils
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.Color
 import com.pkukielka.stronghold.effect.FireEffect
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
 
 object EnemyRenderer {
 
@@ -20,7 +21,7 @@ object EnemyRenderer {
 trait EnemyRenderer {
   self: Enemy =>
 
-  val unitScale = 1 / 96f
+  val unitScale = 1 / 64f
   var fireEffect: ParticleEffectPool#PooledEffect = null
 
   def currentFrame: TextureRegion = {
@@ -36,11 +37,6 @@ trait EnemyRenderer {
 
   def height: Float = currentFrame.getRegionHeight * unitScale
 
-  def isHit(xScreen: Float, yScreen: Float, utils: IsometricMapUtils): Boolean = {
-    val pos = utils.mapToCameraCoordinates(position.x, position.y)
-    pos.x <= xScreen && pos.x + width >= xScreen && pos.y <= yScreen && pos.y + height >= yScreen
-  }
-
   def setOnFire(time: Float) {
     if (fireEffect == null) {
       fireEffect = FireEffect.obtain
@@ -50,11 +46,11 @@ trait EnemyRenderer {
     fireEffect.reset()
   }
 
-  def drawLifeBar(shapeRenderer: ShapeRenderer, utils: IsometricMapUtils) {
+  def drawLifeBar(shapeRenderer: ShapeRenderer) {
     import EnemyRenderer.lifeBar
 
     if (!isDead && life != maxLife) {
-      val pos = utils.mapToCameraCoordinates(position.x, position.y)
+      val pos = IsometricMapUtils.mapToCameraCoordinates(position.x, position.y)
       val x = pos.x + (width - 0.5f) / 2
       val y = pos.y + height + lifeBar.distance
       val lifeRatio = life / maxLife
@@ -66,9 +62,15 @@ trait EnemyRenderer {
     }
   }
 
-  def drawModel(batch: SpriteBatch, deltaTime: Float, utils: IsometricMapUtils) {
-    val pos = utils.mapToCameraCoordinates(position.x, position.y)
-    batch.draw(currentFrame, pos.x, pos.y, width, height)
+  def drawModel(batch: SpriteBatch, deltaTime: Float) {
+    val pos = IsometricMapUtils.mapToCameraCoordinates(position.x, position.y)
+    batch.draw(
+      currentFrame,
+      pos.x - 0.5f + currentFrame.asInstanceOf[AtlasRegion].offsetX * unitScale,
+      pos.y - 0.5f + currentFrame.asInstanceOf[AtlasRegion].offsetY * unitScale,
+      width,
+      height
+    )
 
     if (fireEffect != null) {
       if (fireEffect.isComplete) {

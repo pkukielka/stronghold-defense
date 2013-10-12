@@ -5,22 +5,15 @@ import scala.Array
 import scala.annotation.tailrec
 import scala.collection.mutable
 import com.pkukielka.stronghold.{InfluencesManager, MapBuilder}
+import com.pkukielka.stronghold.MapBuilder._
 
-object PathFinder {
-  val inf: Distance = Int.MaxValue
-
-  type Node = Int
-  type NodeWithPriority = Long
-  type Distance = Int
-}
-
-class PathFinder(map: MapBuilder, influencesManager: InfluencesManager) {
-
-  import PathFinder._
+class PathFinder(val destination: Node, val map: MapBuilder, val influencesManager: InfluencesManager) {
 
   private val distances = Array.fill[Distance](map.nodesCount)(inf)
   private val queue = mutable.PriorityQueue.empty[NodeWithPriority]
   val target = new Vector2()
+
+  def update = findShortestPathsTo(destination)
 
   @tailrec
   final def getFreePosition: Vector2 = {
@@ -40,9 +33,9 @@ class PathFinder(map: MapBuilder, influencesManager: InfluencesManager) {
     getFreePosition
   }
 
-  def hasConnections(x: Int, y: Int): Boolean = !map.edges(getNode(x, y)).isEmpty
+  def hasConnections(x: Int, y: Int): Boolean = !map.edges(map.getNode(x, y)).isEmpty
 
-  def getInfluence(node: Node) = influencesManager.getSum(node2posX(node), node2posY(node))
+  def getInfluence(node: Node) = influencesManager.getSum(map.node2posX(node), map.node2posY(node))
 
 
   def getNextStep(currentPosition: Vector2): Node = {
@@ -54,22 +47,14 @@ class PathFinder(map: MapBuilder, influencesManager: InfluencesManager) {
       findClosestNode(edges.tail, if (distances(edges.head) < distances(closestNode)) edges.head else closestNode)
     }
 
-    findClosestNode(map.edges(getNode(currentPosition)).tail, map.edges(getNode(currentPosition)).head)
+    findClosestNode(map.edges(map.getNode(currentPosition)).tail, map.edges(map.getNode(currentPosition)).head)
   }
-
-  def getNode(position: Vector2): Node = getNode(position.x.toInt, position.y.toInt)
-
-  def getNode(x: Int, y: Int): Node = y * map.width + x
-
-  def node2posX(node: Node): Int = node % map.width
-
-  def node2posY(node: Node): Int = node / map.width
 
   def findShortestPathsTo(destination: Node) = {
     for (i <- distances.indices) distances(i) = inf
     distances(destination) = 0
 
-    target.set(node2posX(destination), node2posY(destination))
+    target.set(map.node2posX(destination), map.node2posY(destination))
 
     queue.enqueue(destination)
 

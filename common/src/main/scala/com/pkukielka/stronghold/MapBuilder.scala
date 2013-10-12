@@ -4,7 +4,7 @@ import com.badlogic.gdx.maps.tiled.{TiledMapTileLayer, TiledMap}
 import com.badlogic.gdx.maps.MapProperties
 import scala.collection.mutable.MutableList
 import scala.collection.convert.WrapAsScala.asScalaIterator
-import com.pkukielka.stronghold.enemy.PathFinder
+import com.badlogic.gdx.math.Vector2
 
 case class HeightMap(downLeft: Int, topLeft: Int, topRight: Int, downRight: Int) {
   def isGroundLevel: Boolean =
@@ -20,8 +20,17 @@ case class HeightMap(downLeft: Int, topLeft: Int, topRight: Int, downRight: Int)
   def isMatchingDiagonal(hm: HeightMap) = topRight == hm.downLeft
 }
 
+object MapBuilder {
+  val inf: Distance = Int.MaxValue
+
+  type Node = Int
+  type NodeWithPriority = Long
+  type Distance = Int
+}
+
 class MapBuilder(map: TiledMap) {
-  import PathFinder._
+
+  import MapBuilder._
 
   val height = map.getProperties.get("height").asInstanceOf[Int]
   val width = map.getProperties.get("width").asInstanceOf[Int]
@@ -44,6 +53,14 @@ class MapBuilder(map: TiledMap) {
       }
     }
   }
+
+  def getNode(position: Vector2): Node = getNode(position.x.toInt, position.y.toInt)
+
+  def getNode(x: Int, y: Int): Node = y * width + x
+
+  def node2posX(node: Node): Int = node % width
+
+  def node2posY(node: Node): Int = node / width
 
   private def getProperty(properties: MapProperties, key: String) = properties.get(key).asInstanceOf[String]
 

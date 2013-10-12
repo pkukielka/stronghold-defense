@@ -7,7 +7,6 @@ import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer
 import com.badlogic.gdx.input.GestureDetector
 import scala.language.implicitConversions
-import com.pkukielka.stronghold.enemy._
 import com.pkukielka.stronghold.assets.Assets
 
 class StrongholdDefense extends Game {
@@ -51,6 +50,7 @@ class StrongholdDefense extends Game {
 
         isLoaded = true
       }
+
       batch.begin()
       batch.draw(splash, 0, 0, Gdx.graphics.getWidth, Gdx.graphics.getHeight)
       batch.end()

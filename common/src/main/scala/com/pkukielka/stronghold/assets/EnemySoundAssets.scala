@@ -13,7 +13,7 @@ class EnemySoundAssets(name: String) {
   var criticDie: Sound = _
 
   def load(assetManager: AssetManager) {
-    Array("hit", "die", "ment", "phys", "critdie").foreach{
+    Array("hit", "die", "ment", "phys", "critdie").foreach {
       sound =>
         assetManager.load(enemiesSoundsDir + name + "_" + sound + ".ogg", classOf[Sound])
     }

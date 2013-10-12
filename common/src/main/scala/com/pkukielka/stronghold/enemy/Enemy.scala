@@ -2,7 +2,7 @@ package com.pkukielka.stronghold.enemy
 
 import com.badlogic.gdx.math.Vector2
 import scala.language.implicitConversions
-import com.pkukielka.stronghold.assets.Assets
+import com.pkukielka.stronghold.assets.EnemyAssets
 
 abstract class Enemy(pathFinder: PathFinder) extends EnemyRenderer {
   var animationTime = Math.random().toFloat
@@ -18,7 +18,7 @@ abstract class Enemy(pathFinder: PathFinder) extends EnemyRenderer {
     var damagePerSecond = 0f
   }
 
-  def assets: Assets
+  def assets: EnemyAssets
 
   def maxLife: Float = 100f
 
@@ -53,8 +53,8 @@ abstract class Enemy(pathFinder: PathFinder) extends EnemyRenderer {
   def move(deltaTime: Float) {
     val next = pathFinder.getNextStep(position)
     directionVector.set(
-      pathFinder.node2posX(next) + xOffset - position.x,
-      pathFinder.node2posY(next) + yOffset - position.y
+      pathFinder.map.node2posX(next) + xOffset - position.x,
+      pathFinder.map.node2posY(next) + yOffset - position.y
     ).nor()
     directionVector.scl(velocity * deltaTime)
     position.add(directionVector)
