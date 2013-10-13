@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 class GestureCamController(val camera: OrthographicCamera, val onTap: (Float, Float) => Unit)
   extends GestureAdapter {
   var initialScale = 1f
-  val utils = new IsometricMapUtils(camera)
 
   override def touchDown(x: Float, y: Float, pointer: Int, button: Int): Boolean = {
     initialScale = camera.zoom
@@ -14,7 +13,7 @@ class GestureCamController(val camera: OrthographicCamera, val onTap: (Float, Fl
   }
 
   override def tap(x: Float, y: Float, count: Int, button: Int): Boolean = {
-    val tilePosition = utils.screenToCameraCoordinates(x, y)
+    val tilePosition = IsometricMapUtils.screenToCameraCoordinates(x, y)
     onTap(tilePosition.x, tilePosition.y)
     false
   }

@@ -4,30 +4,42 @@ import com.badlogic.gdx.math.{Vector3, Vector2, Matrix3}
 import com.badlogic.gdx.graphics.OrthographicCamera
 
 object IsometricMapUtils {
-  val mutablePosition = new Vector2()
+  var unitScale: Float = _
+  private var halfTileWidth: Float = _
+  private var halfTileHeight: Float = _
+  private var camera: OrthographicCamera = null
+  private val mutablePosition3 = new Vector3()
+  private val mutablePosition = new Vector2()
 
-  val screenToTileTranslate = new Matrix3().translate(0.0f, -0.22f)
-  val screenToTileScale = new Matrix3().scale(Math.sqrt(2.0).toFloat, (2.0f * Math.sqrt(2.0)).toFloat)
-  val screenToTileRotate = new Matrix3().rotate(45.0f)
-
-  val mapToScreenTranslate = new Matrix3().translate(0.0f, 0.22f)
-  val mapToScreenScale = new Matrix3().scale(1.0f / Math.sqrt(2.0).toFloat, 1.0f / (2.0f * Math.sqrt(2.0)).toFloat)
-  val mapToScreenRotate = new Matrix3().rotate(-45.0f)
-
-  def mapToCameraCoordinates(mapX: Float, mapY: Float): Vector2 = {
-    mutablePosition.set(mapX, mapY)
-    mutablePosition.mul(mapToScreenRotate).mul(mapToScreenScale).mul(mapToScreenTranslate)
+  def init(camera: OrthographicCamera, unitScale: Float, tileWidth: Float, tileHeight: Float) =
+  {
+    this.unitScale = unitScale
+    this.halfTileWidth = tileWidth * 0.5f *  unitScale
+    this.halfTileHeight = tileHeight * 0.5f * unitScale
+    this.camera = camera
   }
 
-  def cameraToMapCoordinates(cameraX: Float, cameraY: Float): Vector2 = {
-    mutablePosition.set(cameraX, cameraY)
-    mutablePosition.mul(screenToTileTranslate).mul(screenToTileScale).mul(screenToTileRotate)
-  }
-}
+  def mapToCameraX(mapPositionX: Float, mapPositionY: Float) =
+    (mapPositionY * halfTileWidth) + (mapPositionX * halfTileWidth)
 
-class IsometricMapUtils(val camera: OrthographicCamera) {
-  val mutablePosition3 = new Vector3()
-  val mutablePosition = new Vector2()
+  def mapToCameraY(mapPositionX: Float, mapPositionY: Float) =
+    (mapPositionY * halfTileHeight) - (mapPositionX * halfTileHeight)
+
+  def mapToCameraX(mapPosition: Vector2): Float = mapToCameraX(mapPosition.x, mapPosition.y)
+
+  def mapToCameraY(mapPosition: Vector2): Float = mapToCameraY(mapPosition.x, mapPosition.y)
+
+  def cameraToMapX(cameraPositionX: Float, cameraPositionY: Float) =
+    (cameraPositionX / (2 * halfTileWidth)) -  (cameraPositionY / (2 * halfTileHeight))
+
+  def cameraToMapY(cameraPositionX: Float, cameraPositionY: Float) =
+    (cameraPositionX / (2 * halfTileWidth)) +  (cameraPositionY / (2 * halfTileHeight))
+
+  def cameraToMapX(cameraPosition: Vector2): Float =
+    cameraToMapX(cameraPosition.x, cameraPosition.y)
+
+  def cameraToMapY(cameraPosition: Vector2): Float =
+    cameraToMapY(cameraPosition.x, cameraPosition.y)
 
   def screenToCameraCoordinates(screenX: Float, screenY: Float): Vector2 = {
     mutablePosition3.set(screenX, screenY, 0f)
@@ -35,3 +47,4 @@ class IsometricMapUtils(val camera: OrthographicCamera) {
     mutablePosition.set(mutablePosition3.x, mutablePosition3.y)
   }
 }
+

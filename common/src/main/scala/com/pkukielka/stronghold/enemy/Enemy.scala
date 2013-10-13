@@ -3,13 +3,12 @@ package com.pkukielka.stronghold.enemy
 import com.badlogic.gdx.math.{Intersector, Vector2}
 import scala.language.implicitConversions
 import com.pkukielka.stronghold.assets.EnemyAssets
-import com.pkukielka.stronghold.IsometricMapUtils
 
 abstract class Enemy(pathFinder: PathFinder) extends EnemyRenderer {
   var animationTime = Math.random().toFloat
   var xOffset = (0.5f + (Math.random() - 0.5f) / 4).toFloat
   var yOffset = (0.5f + (Math.random() - 0.5f) / 4).toFloat
-  val position = pathFinder.getFreePosition.add(xOffset, yOffset)
+  val position =  pathFinder.getFreePosition.add(xOffset, yOffset)
   var directionVector = new Vector2()
   var life = maxLife
 
@@ -47,12 +46,10 @@ abstract class Enemy(pathFinder: PathFinder) extends EnemyRenderer {
   }
 
   def isHit(segmentStart: Vector2, segmentEnd: Vector2): Boolean = {
-    val pos = IsometricMapUtils.mapToCameraCoordinates(position.x, position.y)
-
-    isIntersectingPath(segmentStart, segmentEnd, pos.x, pos.y, pos.x + width, pos.y) ||
-      isIntersectingPath(segmentStart, segmentEnd, pos.x, pos.y, pos.x, pos.y + height) ||
-      isIntersectingPath(segmentStart, segmentEnd, pos.x + width, pos.y, pos.x + width, pos.y + height) ||
-      isIntersectingPath(segmentStart, segmentEnd, pos.x, pos.y + height, pos.x + width, pos.y + height)
+    isIntersectingPath(segmentStart, segmentEnd, position.x, position.y, position.x + width, position.y) ||
+      isIntersectingPath(segmentStart, segmentEnd, position.x, position.y, position.x, position.y + height) ||
+      isIntersectingPath(segmentStart, segmentEnd, position.x + width, position.y, position.x + width, position.y + height) ||
+      isIntersectingPath(segmentStart, segmentEnd, position.x, position.y + height, position.x + width, position.y + height)
   }
 
   def hit(damage: Float) {
@@ -70,13 +67,14 @@ abstract class Enemy(pathFinder: PathFinder) extends EnemyRenderer {
     }
   }
 
-  def move(deltaTime: Float) {
+  private def move(deltaTime: Float) {
     val next = pathFinder.getNextStep(position)
+
     directionVector.set(
       pathFinder.map.node2posX(next) + xOffset - position.x,
       pathFinder.map.node2posY(next) + yOffset - position.y
-    ).nor()
-    directionVector.scl(velocity * deltaTime)
+    ).nor().scl(velocity * deltaTime)
+
     position.add(directionVector)
 
     if (position.epsilonEquals(pathFinder.target, 1f)) {

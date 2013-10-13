@@ -13,7 +13,7 @@ object EnemyRenderer {
     val width = 0.4f
     val height = 0.06f
     val margin = 0.02f
-    val distance = 0.1f
+    val distance = 0.2f
   }
 
 }
@@ -21,7 +21,6 @@ object EnemyRenderer {
 trait EnemyRenderer {
   self: Enemy =>
 
-  val unitScale = 1 / 64f
   var fireEffect: ParticleEffectPool#PooledEffect = null
 
   def currentFrame: TextureRegion = {
@@ -33,9 +32,9 @@ trait EnemyRenderer {
     }
   }
 
-  def width: Float = currentFrame.getRegionWidth * unitScale
+  def width: Float = currentFrame.getRegionWidth * IsometricMapUtils.unitScale
 
-  def height: Float = currentFrame.getRegionHeight * unitScale
+  def height: Float = currentFrame.getRegionHeight * IsometricMapUtils.unitScale
 
   def setOnFire(time: Float) {
     if (fireEffect == null) {
@@ -46,13 +45,16 @@ trait EnemyRenderer {
     fireEffect.reset()
   }
 
+  private def getXAdjustment = -0.5f + currentFrame.asInstanceOf[AtlasRegion].offsetX * IsometricMapUtils.unitScale
+
+  private def getYAdjustment = -0.5f + currentFrame.asInstanceOf[AtlasRegion].offsetY * IsometricMapUtils.unitScale
+
   def drawLifeBar(shapeRenderer: ShapeRenderer) {
     import EnemyRenderer.lifeBar
 
     if (!isDead && life != maxLife) {
-      val pos = IsometricMapUtils.mapToCameraCoordinates(position.x, position.y)
-      val x = pos.x + (width - 0.5f) / 2
-      val y = pos.y + height + lifeBar.distance
+      val x = IsometricMapUtils.mapToCameraX(position) + (width - lifeBar.width) / 2 + getXAdjustment
+      val y = IsometricMapUtils.mapToCameraY(position) + height + lifeBar.distance + getYAdjustment
       val lifeRatio = life / maxLife
 
       shapeRenderer.setColor(Color.BLACK)
@@ -63,14 +65,10 @@ trait EnemyRenderer {
   }
 
   def drawModel(batch: SpriteBatch, deltaTime: Float) {
-    val pos = IsometricMapUtils.mapToCameraCoordinates(position.x, position.y)
-    batch.draw(
-      currentFrame,
-      pos.x - 0.5f + currentFrame.asInstanceOf[AtlasRegion].offsetX * unitScale,
-      pos.y - 0.5f + currentFrame.asInstanceOf[AtlasRegion].offsetY * unitScale,
-      width,
-      height
-    )
+    batch.draw(currentFrame,
+      IsometricMapUtils.mapToCameraX(position) + getXAdjustment,
+      IsometricMapUtils.mapToCameraY(position) + getYAdjustment,
+      width, height)
 
     if (fireEffect != null) {
       if (fireEffect.isComplete) {
@@ -78,7 +76,9 @@ trait EnemyRenderer {
         fireEffect = null
       }
       else {
-        fireEffect.setPosition(pos.x + width * 0.5f, pos.y + height * 0.5f)
+        fireEffect.setPosition(
+          IsometricMapUtils.mapToCameraX(position) + width * 0.5f + getXAdjustment,
+          IsometricMapUtils.mapToCameraY(position) + height * 0.5f + getYAdjustment)
         fireEffect.draw(batch, deltaTime)
       }
     }

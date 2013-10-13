@@ -22,24 +22,25 @@ object Arrow {
 }
 
 class Arrow extends Effect {
-  val position: Vector2 = new Vector2()
-  val previousPosition = new Vector2()
-  var heightsDifference: Float = 0f
-  val direction: Vector2 = new Vector2()
-  val path = new Bezier[Vector2]
-  var time = 0f
-  var timeToComplete = 0f
+  protected val position: Vector2 = new Vector2()
+  protected val previousPosition = new Vector2()
+  protected val direction: Vector2 = new Vector2()
+  private var heightsDifference: Float = 0f
+  private val path = new Bezier[Vector2]
+  private var time = 0f
+  private var timeToComplete = 0f
 
   object temp {
     val middle: Vector2 = new Vector2()
     val target: Vector2 = new Vector2()
+    val p1, p2: Vector2 = new Vector2()
   }
 
   import Arrow._
 
   def init(xStart: Float, yStart: Float, xEnd: Float, yEnd: Float, heightsDifference: Float) {
-    position.set(xStart, yStart)
-    temp.target.set(xEnd, yEnd)
+    position.set(IsometricMapUtils.mapToCameraX(xStart, yStart), IsometricMapUtils.mapToCameraY(xStart, yStart))
+    temp.target.set(IsometricMapUtils.mapToCameraX(xEnd, yEnd), IsometricMapUtils.mapToCameraY(xEnd, yEnd))
     this.heightsDifference = heightsDifference
 
     val distance = position.dst(temp.target)
@@ -65,7 +66,9 @@ class Arrow extends Effect {
   }
 
   private def updateWorldState(enemies: Array[Enemy], pathFinder: PathFinder): Unit = {
-    for (enemy <- enemies if !enemy.isDead && enemy.isHit(previousPosition, position)) {
+    temp.p1.set(IsometricMapUtils.cameraToMapX(previousPosition), IsometricMapUtils.cameraToMapY(previousPosition))
+    temp.p2.set(IsometricMapUtils.cameraToMapX(position), IsometricMapUtils.cameraToMapY(position))
+    for (enemy <- enemies if !enemy.isDead && enemy.isHit(temp.p1, temp.p2)) {
       enemy.hit((baseDamage + Math.random() * randomDamage).toInt)
       if (enemy.isDead) {
         pathFinder.influencesManager.add(10000f, enemy.position, 1000f, 200, 3f)

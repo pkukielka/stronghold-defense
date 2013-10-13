@@ -40,7 +40,7 @@ class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: Strin
     } else {
       new Arrow()
     }
-    arrow.init(12, 3, x, y, 0)
+    arrow.init(6.5f, 19, IsometricMapUtils.cameraToMapX(x, y), IsometricMapUtils.cameraToMapY(x, y), 0)
     bullets += arrow
   }
 
@@ -49,7 +49,7 @@ class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: Strin
 
     influencesManager.update(delta)
 
-    enemies.sortBy(e => -IsometricMapUtils.mapToCameraCoordinates(e.position.x, e.position.y).y)
+    enemies.sortBy(_.position.y)
 
     for (enemy <- enemies) {
       enemy.update(delta)

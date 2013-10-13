@@ -3,7 +3,7 @@ package com.pkukielka.stronghold
 import com.badlogic.gdx.{InputMultiplexer, Game, Gdx}
 import com.badlogic.gdx.graphics.{Texture, OrthographicCamera, GL10}
 import com.badlogic.gdx.graphics.g2d.{BitmapFont, SpriteBatch}
-import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
+import com.badlogic.gdx.maps.tiled.{TiledMapTileLayer, TiledMap, TmxMapLoader}
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer
 import com.badlogic.gdx.input.GestureDetector
 import scala.language.implicitConversions
@@ -30,8 +30,12 @@ class StrongholdDefense extends Game {
     font = new BitmapFont()
     batch = new SpriteBatch(1100)
 
+    val unitScale = 1f / 64f
     map = new TmxMapLoader().load("data/maps/test.tmx")
-    renderer = new IsometricTiledMapRenderer(map, 1f / 64f)
+    renderer = new IsometricTiledMapRenderer(map, unitScale)
+
+    val tiledMapLayer = map.getLayers.get(0).asInstanceOf[TiledMapTileLayer]
+    IsometricMapUtils.init(camera, unitScale, tiledMapLayer.getTileWidth, tiledMapLayer.getHeight)
 
     splash = new Texture(Gdx.files.internal("data/textures/splash.png"))
   }
@@ -59,7 +63,6 @@ class StrongholdDefense extends Game {
     }
 
     camera.update()
-
     renderer.setView(camera)
     renderer.render()
     animationManager.update(renderer.getSpriteBatch, Gdx.graphics.getDeltaTime)
