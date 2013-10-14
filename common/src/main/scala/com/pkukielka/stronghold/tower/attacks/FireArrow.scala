@@ -1,4 +1,4 @@
-package com.pkukielka.stronghold.tower.effects
+package com.pkukielka.stronghold.tower.attacks
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.pkukielka.stronghold.effect.FireEffect

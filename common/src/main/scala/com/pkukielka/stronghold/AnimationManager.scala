@@ -10,8 +10,9 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import scala.Array
 import com.pkukielka.stronghold.enemy.units._
 import com.pkukielka.stronghold.enemy.PathFinder
-import com.pkukielka.stronghold.tower.effects.{Arrow, FireArrow}
-import com.pkukielka.stronghold.tower.Effect
+import com.pkukielka.stronghold.tower.attacks.{Arrow, FireArrow}
+import com.pkukielka.stronghold.tower.{ArcherTower, Tower, Attack}
+import com.badlogic.gdx.math.Vector2
 
 class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: String) {
   private val attack = Gdx.audio.newSound(Gdx.files.internal("data/sound/powers/shoot.ogg"))
@@ -21,7 +22,8 @@ class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: Strin
   private implicit val influencesManager = new InfluencesManager(mapBuilder.width, mapBuilder.height)
   private implicit val pathFinder = new PathFinder(mapBuilder.getNode(7, 29), mapBuilder, influencesManager)
 
-  val bullets = ArrayBuffer.empty[Effect]
+  val bullets = ArrayBuffer.empty[Attack]
+  val towers = ArrayBuffer.empty[Tower]
   var totalTime = 0.0f
 
   pathFinder.update
@@ -35,13 +37,7 @@ class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: Strin
 
   def hit(x: Float, y: Float) {
     attack.play()
-    val arrow = if ((bullets.size + 1) % 2 == 0) {
-      new FireArrow()
-    } else {
-      new Arrow()
-    }
-    arrow.init(6.5f, 19, IsometricMapUtils.cameraToMapX(x, y), IsometricMapUtils.cameraToMapY(x, y), 0)
-    bullets += arrow
+    towers += new ArcherTower(new Vector2(IsometricMapUtils.cameraToMapX(x, y), IsometricMapUtils.cameraToMapY(x, y)))
   }
 
   def update(batch: SpriteBatch, deltaTime: Float) {
@@ -59,6 +55,10 @@ class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: Strin
       bullet.update(delta, enemies, pathFinder)
     }
 
+    for (tower <- towers) {
+      tower.update(delta, enemies, bullets)
+    }
+
     batch.begin()
     for (enemy <- enemies if enemy.isDead) {
       enemy.drawModel(batch, delta)
@@ -74,6 +74,12 @@ class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: Strin
     batch.begin()
     for (enemy <- enemies if !enemy.isDead) {
       enemy.drawModel(batch, delta)
+    }
+    batch.end()
+
+    batch.begin()
+    for (tower <- towers) {
+      tower.draw(batch)
     }
     batch.end()
 

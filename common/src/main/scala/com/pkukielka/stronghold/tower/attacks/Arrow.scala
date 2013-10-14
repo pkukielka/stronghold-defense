@@ -1,19 +1,19 @@
-package com.pkukielka.stronghold.tower.effects
+package com.pkukielka.stronghold.tower.attacks
 
 import com.badlogic.gdx.graphics.g2d.{Sprite, SpriteBatch}
 import com.badlogic.gdx.math._
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.Gdx
-import com.pkukielka.stronghold.tower.Effect
+import com.pkukielka.stronghold.tower.Attack
 import com.pkukielka.stronghold.enemy.{PathFinder, Enemy}
 import com.pkukielka.stronghold.IsometricMapUtils
 
 object Arrow {
-  val maxMiss = 1f
+  val maxMiss = 2f
   val maxRange = 20f
   val baseDamage = 30f
   val randomDamage = 50f
-  val velocity = 30f
+  val velocity = 20f
   val heightRangeIncrease = 1.2f
   val spriteScale = 1 / 256f
 
@@ -21,7 +21,7 @@ object Arrow {
   val arrow_sprite = new Sprite(new Texture(Gdx.files.internal("data/textures/bullets/arrow.png")))
 }
 
-class Arrow extends Effect {
+class Arrow extends Attack {
   protected val position: Vector2 = new Vector2()
   protected val previousPosition = new Vector2()
   protected val direction: Vector2 = new Vector2()
@@ -50,6 +50,7 @@ class Arrow extends Effect {
     temp.target.add(((0.5 - Math.random()) * currentMiss).toFloat, ((0.5 - Math.random()) * currentMiss).toFloat)
     temp.middle.set(position).add(temp.target).scl(0.5f).add(0, heightAddition)
     path.set(position, temp.middle, temp.target)
+    direction.set(temp.target).sub(position).nor()
 
     time = 0f
     timeToComplete = distance / velocity
