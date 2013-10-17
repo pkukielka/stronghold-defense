@@ -40,7 +40,7 @@ class Arrow extends Attack {
     val currentMiss = (distance / maxRange) * maxMiss
     val heightAddition = (distance / maxRange) * distance * 0.5f
 
-    temp.target.add(((0.5 - Math.random()) * currentMiss).toFloat, ((0.5 - Math.random()) * currentMiss).toFloat)
+    temp.target.add(((0.5 - scala.math.random) * currentMiss).toFloat, ((0.5 - scala.math.random) * currentMiss).toFloat)
     temp.middle.set(position).add(temp.target).scl(0.5f).add(0, heightAddition)
     path.set(position, temp.middle, temp.target)
     direction.set(temp.target).sub(position).nor()
@@ -62,7 +62,7 @@ class Arrow extends Attack {
     temp.p1.set(IsometricMapUtils.cameraToMapX(previousPosition), IsometricMapUtils.cameraToMapY(previousPosition))
     temp.p2.set(IsometricMapUtils.cameraToMapX(position), IsometricMapUtils.cameraToMapY(position))
     for (enemy <- enemies if !enemy.isDead && enemy.isHit(temp.p1, temp.p2)) {
-      enemy.hit((baseDamage + Math.random() * randomDamage).toInt)
+      enemy.hit((baseDamage + scala.math.random * randomDamage).toInt)
       if (enemy.isDead) {
         pathFinder.influencesManager.add(10000f, enemy.position, 1000f, 200, 3f)
         pathFinder.update

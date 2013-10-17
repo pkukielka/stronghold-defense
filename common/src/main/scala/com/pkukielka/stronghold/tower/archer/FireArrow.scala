@@ -23,7 +23,7 @@ class FireArrow extends Arrow {
       temp.p1.set(IsometricMapUtils.cameraToMapX(previousPosition), IsometricMapUtils.cameraToMapY(previousPosition))
       temp.p2.set(IsometricMapUtils.cameraToMapX(position), IsometricMapUtils.cameraToMapY(position))
       for (enemy <- enemies if !enemy.isDead && enemy.isHit(temp.p1, temp.p2)) {
-        enemy.setOnFire(1 + Math.random().toFloat * 4, 20)
+        enemy.setOnFire(1 + scala.math.random.toFloat * 4, 20)
       }
     }
   }

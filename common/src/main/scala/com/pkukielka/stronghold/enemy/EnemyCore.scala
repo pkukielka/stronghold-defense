@@ -4,9 +4,9 @@ import com.badlogic.gdx.math.{Intersector, Vector2}
 import scala.language.implicitConversions
 
 abstract class EnemyCore(pathFinder: PathFinder) extends Enemy {
-  var animationTime = Math.random().toFloat
-  var xOffset = (0.5f + (Math.random() - 0.5f) / 4).toFloat
-  var yOffset = (0.5f + (Math.random() - 0.5f) / 4).toFloat
+  var animationTime = scala.math.random.toFloat
+  var xOffset = (0.5f + (scala.math.random - 0.5f) / 4).toFloat
+  var yOffset = (0.5f + (scala.math.random - 0.5f) / 4).toFloat
   val position =  pathFinder.getFreePosition.add(xOffset, yOffset)
   var directionVector = new Vector2()
   var life = maxLife

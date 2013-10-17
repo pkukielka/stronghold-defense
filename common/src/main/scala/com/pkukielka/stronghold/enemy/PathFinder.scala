@@ -17,9 +17,9 @@ class PathFinder(val destination: Node, val map: MapBuilder, val influencesManag
 
   @tailrec
   final def getFreePosition: Vector2 = {
-    val side = (Math.random() * 4).toInt
-    val x = (Math.random() * 29.0f).toInt
-    val y = (Math.random() * 29.0f).toInt
+    val side = (scala.math.random * 4).toInt
+    val x = (scala.math.random * 29.0f).toInt
+    val y = (scala.math.random * 29.0f).toInt
     val maxX = map.width - 1
     val maxY = map.height - 1
 

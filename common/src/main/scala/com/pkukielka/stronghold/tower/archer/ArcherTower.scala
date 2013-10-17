@@ -14,7 +14,7 @@ object ArcherTower {
 class ArcherTower(val position: Vector2) extends Tower {
   import ArcherTower._
 
-  var time = Math.random().toFloat
+  var time = scala.math.random.toFloat
   var properties = version1
 
   private def findNewTarget(enemies: Array[EnemyCore]) = enemies.minBy{ enemy=>
@@ -26,13 +26,13 @@ class ArcherTower(val position: Vector2) extends Tower {
     if (time > properties.shootInterval) {
       time -= properties.shootInterval
 
-      val count = (Math.random() * 3f).toInt
+      val count = (scala.math.random * 3f).toInt
 
       for (i <- 0 to count) {
         val target = findNewTarget(enemies)
 
         if (!target.isDead && target.position.dst(position) < 10) {
-          val arrow = (Math.random() * 10).toInt match {
+          val arrow = (scala.math.random * 10).toInt match {
             case x if x >= 0 && x < 6 => new Arrow with ArrowRenderer
             case _ => new FireArrow with FireArrowRenderer
           }

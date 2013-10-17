@@ -41,7 +41,7 @@ trait EnemyCoreRenderer extends Enemy{
 
   abstract override def turn() {
     super.turn()
-    if (Math.random() > 0.95) {
+    if (scala.math.random > 0.95) {
       assets.sound.ment.play()
     }
   }
