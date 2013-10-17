@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.pkukielka.stronghold.effect.FireEffect
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
 
-object EnemyRenderer {
+object EnemyCoreRenderer {
 
   object lifeBar {
     val width = 0.4f
@@ -18,12 +18,35 @@ object EnemyRenderer {
 
 }
 
-trait EnemyRenderer {
-  self: Enemy =>
+trait EnemyCoreRenderer extends Enemy{
+  self: EnemyCore =>
 
   var fireEffect: ParticleEffectPool#PooledEffect = null
 
-  def currentFrame: TextureRegion = {
+  override def width: Float = currentFrame.getRegionWidth * IsometricMapUtils.unitScale
+
+  override def height: Float = currentFrame.getRegionHeight * IsometricMapUtils.unitScale
+
+  abstract override def die() {
+    super.die()
+    assets.sound.die.play()
+  }
+
+  abstract override def harm(damage: Float) {
+    super.harm(damage)
+    if (damage > maxLife * 0.1f) {
+      assets.sound.hit.play()
+    }
+  }
+
+  abstract override def turn() {
+    super.turn()
+    if (Math.random() > 0.95) {
+      assets.sound.ment.play()
+    }
+  }
+
+  private def currentFrame: TextureRegion = {
     if (isDead) {
       assets.gfx.dieAnimations(angle).getKeyFrame(animationTime, false)
     }
@@ -32,11 +55,15 @@ trait EnemyRenderer {
     }
   }
 
-  def width: Float = currentFrame.getRegionWidth * IsometricMapUtils.unitScale
+  private def angle = (((247.5 - Math.toDegrees(Math.atan2(directionVector.y, directionVector.x))) % 360) / 45).toInt
 
-  def height: Float = currentFrame.getRegionHeight * IsometricMapUtils.unitScale
+  private def getXAdjustment = -0.5f + currentFrame.asInstanceOf[AtlasRegion].offsetX * IsometricMapUtils.unitScale
 
-  def setOnFire(time: Float) {
+  private def getYAdjustment = -0.5f + currentFrame.asInstanceOf[AtlasRegion].offsetY * IsometricMapUtils.unitScale
+
+  abstract override def setOnFire(time: Float, damagePerSecond: Float) {
+    super.setOnFire(time, damagePerSecond)
+
     if (fireEffect == null) {
       fireEffect = FireEffect.obtain
     }
@@ -45,12 +72,8 @@ trait EnemyRenderer {
     fireEffect.reset()
   }
 
-  private def getXAdjustment = -0.5f + currentFrame.asInstanceOf[AtlasRegion].offsetX * IsometricMapUtils.unitScale
-
-  private def getYAdjustment = -0.5f + currentFrame.asInstanceOf[AtlasRegion].offsetY * IsometricMapUtils.unitScale
-
   def drawLifeBar(shapeRenderer: ShapeRenderer) {
-    import EnemyRenderer.lifeBar
+    import EnemyCoreRenderer.lifeBar
 
     if (!isDead && life != maxLife) {
       val x = IsometricMapUtils.mapToCameraX(position) + (width - lifeBar.width) / 2 + getXAdjustment

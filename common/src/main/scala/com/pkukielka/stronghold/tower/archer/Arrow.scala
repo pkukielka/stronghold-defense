@@ -1,11 +1,8 @@
-package com.pkukielka.stronghold.tower.attacks
+package com.pkukielka.stronghold.tower.archer
 
-import com.badlogic.gdx.graphics.g2d.{Sprite, SpriteBatch}
 import com.badlogic.gdx.math._
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.Gdx
 import com.pkukielka.stronghold.tower.Attack
-import com.pkukielka.stronghold.enemy.{PathFinder, Enemy}
+import com.pkukielka.stronghold.enemy.{PathFinder, EnemyCore}
 import com.pkukielka.stronghold.IsometricMapUtils
 
 object Arrow {
@@ -15,10 +12,6 @@ object Arrow {
   val randomDamage = 50f
   val velocity = 20f
   val heightRangeIncrease = 1.2f
-  val spriteScale = 1 / 256f
-
-  val arrow_broken_sprite = new Sprite(new Texture(Gdx.files.internal("data/textures/bullets/arrow_broken.png")))
-  val arrow_sprite = new Sprite(new Texture(Gdx.files.internal("data/textures/bullets/arrow.png")))
 }
 
 class Arrow extends Attack {
@@ -58,7 +51,6 @@ class Arrow extends Attack {
 
   def isCompleted = time == timeToComplete
 
-  private def angle = Math.toDegrees(Math.atan2(direction.y, direction.x)).toFloat
 
   private def updatePosition() = {
     previousPosition.set(position)
@@ -66,7 +58,7 @@ class Arrow extends Attack {
     direction.set(position).sub(previousPosition).nor()
   }
 
-  private def updateWorldState(enemies: Array[Enemy], pathFinder: PathFinder): Unit = {
+  private def updateWorldState(enemies: Array[EnemyCore], pathFinder: PathFinder): Unit = {
     temp.p1.set(IsometricMapUtils.cameraToMapX(previousPosition), IsometricMapUtils.cameraToMapY(previousPosition))
     temp.p2.set(IsometricMapUtils.cameraToMapX(position), IsometricMapUtils.cameraToMapY(position))
     for (enemy <- enemies if !enemy.isDead && enemy.isHit(temp.p1, temp.p2)) {
@@ -79,22 +71,11 @@ class Arrow extends Attack {
     }
   }
 
-  def update(deltaTime: Float, enemies: Array[Enemy], pathFinder: PathFinder) {
+  def update(deltaTime: Float, enemies: Array[EnemyCore], pathFinder: PathFinder) {
     if (!isCompleted) {
       time = (time + deltaTime).min(timeToComplete)
       updatePosition()
       updateWorldState(enemies, pathFinder)
-    }
-  }
-
-  def draw(batch: SpriteBatch) {
-    if (isCompleted) {
-      batch.draw(arrow_broken_sprite, position.x, position.y, 0, 0,
-        arrow_broken_sprite.getWidth, arrow_broken_sprite.getHeight, spriteScale, spriteScale, angle)
-    }
-    else {
-      batch.draw(arrow_sprite, position.x, position.y, 0, 0,
-        arrow_sprite.getWidth, arrow_sprite.getHeight, spriteScale, spriteScale, angle)
     }
   }
 }

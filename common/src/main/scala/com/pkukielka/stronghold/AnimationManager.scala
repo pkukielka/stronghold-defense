@@ -9,10 +9,10 @@ import scala.collection.mutable.ArrayBuffer
 import com.badlogic.gdx.maps.tiled.TiledMap
 import scala.Array
 import com.pkukielka.stronghold.enemy.units._
-import com.pkukielka.stronghold.enemy.PathFinder
-import com.pkukielka.stronghold.tower.attacks.{Arrow, FireArrow}
-import com.pkukielka.stronghold.tower.{ArcherTower, Tower, Attack}
+import com.pkukielka.stronghold.enemy.{EnemyCore, EnemyCoreRenderer, PathFinder}
+import com.pkukielka.stronghold.tower.{Tower, Attack, Renderer}
 import com.badlogic.gdx.math.Vector2
+import com.pkukielka.stronghold.tower.archer.{ArcherTowerRenderer, ArcherTower}
 
 class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: String) {
   private val attack = Gdx.audio.newSound(Gdx.files.internal("data/sound/powers/shoot.ogg"))
@@ -28,16 +28,20 @@ class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: Strin
 
   pathFinder.update
 
-  private val enemies = ArrayBuffer.fill(10)(Array(
-    new Skeleton, new SkeletonArcher, new SkeletonMage, new SkeletonWeak,
-    new Goblin, new EliteGoblin, new EarthAnt, new FireAnt, new IceAnt,
-    new Minotaur, new Stealth, new Zombie,
-    new WyvernWater, new WyvernFire, new WyvernAir, new WyvernEarth
+  private val enemies: Array[EnemyCore] = ArrayBuffer.fill(10)(Array(
+    new Skeleton with EnemyCoreRenderer, new SkeletonArcher with EnemyCoreRenderer,
+    new SkeletonMage with EnemyCoreRenderer, new SkeletonWeak with EnemyCoreRenderer,
+    new Goblin with EnemyCoreRenderer, new EliteGoblin with EnemyCoreRenderer,
+    new EarthAnt with EnemyCoreRenderer, new FireAnt with EnemyCoreRenderer, new IceAnt with EnemyCoreRenderer,
+    new Minotaur with EnemyCoreRenderer, new Stealth with EnemyCoreRenderer, new Zombie with EnemyCoreRenderer,
+    new WyvernWater with EnemyCoreRenderer, new WyvernFire with EnemyCoreRenderer,
+    new WyvernAir with EnemyCoreRenderer, new WyvernEarth with EnemyCoreRenderer
   )).flatten.toArray
 
   def hit(x: Float, y: Float) {
     attack.play()
     towers += new ArcherTower(new Vector2(IsometricMapUtils.cameraToMapX(x, y), IsometricMapUtils.cameraToMapY(x, y)))
+      with ArcherTowerRenderer
   }
 
   def update(batch: SpriteBatch, deltaTime: Float) {
@@ -61,38 +65,38 @@ class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: Strin
 
     batch.begin()
     for (enemy <- enemies if enemy.isDead) {
-      enemy.drawModel(batch, delta)
+      enemy.asInstanceOf[EnemyCoreRenderer].drawModel(batch, delta)
     }
     batch.end()
 
     batch.begin()
     for (bullet <- bullets if bullet.isCompleted) {
-      bullet.draw(batch)
+      bullet.asInstanceOf[Renderer].draw(batch)
     }
     batch.end()
 
     batch.begin()
     for (enemy <- enemies if !enemy.isDead) {
-      enemy.drawModel(batch, delta)
+      enemy.asInstanceOf[EnemyCoreRenderer].drawModel(batch, delta)
     }
     batch.end()
 
     batch.begin()
     for (tower <- towers) {
-      tower.draw(batch)
+      tower.asInstanceOf[Renderer].draw(batch)
     }
     batch.end()
 
     batch.begin()
     for (bullet <- bullets if !bullet.isCompleted) {
-      bullet.draw(batch)
+      bullet.asInstanceOf[Renderer].draw(batch)
     }
     batch.end()
 
     shapeRenderer.setProjectionMatrix(camera.combined)
     shapeRenderer.begin(ShapeType.Filled)
     for (enemy <- enemies) {
-      enemy.drawLifeBar(shapeRenderer)
+      enemy.asInstanceOf[EnemyCoreRenderer].drawLifeBar(shapeRenderer)
     }
     shapeRenderer.end()
   }
