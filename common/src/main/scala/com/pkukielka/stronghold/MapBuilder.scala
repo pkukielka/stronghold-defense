@@ -5,6 +5,7 @@ import com.badlogic.gdx.maps.MapProperties
 import scala.collection.mutable.MutableList
 import scala.collection.convert.WrapAsScala.asScalaIterator
 import com.badlogic.gdx.math.Vector2
+import scala.collection.mutable
 
 case class HeightMap(downLeft: Int, topLeft: Int, topRight: Int, downRight: Int) {
   def isGroundLevel: Boolean =
@@ -37,7 +38,7 @@ class MapBuilder(map: TiledMap) {
   val nodesCount = height * width
 
   val heights = Array.ofDim[HeightMap](width, height)
-  val edges = Array.fill[MutableList[(Node)]](nodesCount)(MutableList.empty[Node])
+  val edges = Array.fill[mutable.MutableList[(Node)]](nodesCount)(mutable.MutableList.empty[Node])
   val weights = Array.fill[Distance](nodesCount, nodesCount)(inf)
 
   {
@@ -80,7 +81,7 @@ class MapBuilder(map: TiledMap) {
       heights(x)(y) = cellsColumnProperties.view
         .map(getProperty(_, "heightMap"))
         .filterNot(_ == null)
-        .map(_.toCharArray.map(_.toString).map(Integer.parseInt(_)))
+        .map(_.toCharArray.map(_.toString).map(Integer.parseInt))
         .map(h => HeightMap(h(0), h(1), h(2), h(3)))
         .fold(HeightMap(0, 0, 0, 0))(_ + _)
     }

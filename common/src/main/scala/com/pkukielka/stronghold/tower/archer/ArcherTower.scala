@@ -28,12 +28,12 @@ class ArcherTower(val position: Vector2) extends Tower {
 
       val count = (Math.random() * 3f).toInt
 
-      for (i <- (0 to count)) {
+      for (i <- 0 to count) {
         val target = findNewTarget(enemies)
 
         if (!target.isDead && target.position.dst(position) < 10) {
           val arrow = (Math.random() * 10).toInt match {
-            case x if (x >= 0 && x < 6) => new Arrow with ArrowRenderer
+            case x if x >= 0 && x < 6 => new Arrow with ArrowRenderer
             case _ => new FireArrow with FireArrowRenderer
           }
           arrow.init(position.x, position.y, target.position.x, target.position.y, 0)
