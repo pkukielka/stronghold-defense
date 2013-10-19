@@ -9,7 +9,10 @@ object Settings {
     version := "0.1",
     scalaVersion := "2.10.1",
     scalacOptions += "-optimize",
-    libraryDependencies += "com.assembla.scala-incubator" % "graph-core_2.10" % "1.6.1",
+    libraryDependencies ++= Seq(
+      "junit" % "junit" % "4.11" % "test",
+      "org.scalatest" % "scalatest_2.10" % "2.0.RC2" % "test"
+    ),
     updateLibsTask
   )
 
