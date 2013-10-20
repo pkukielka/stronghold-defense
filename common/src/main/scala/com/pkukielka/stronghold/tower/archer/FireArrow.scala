@@ -1,7 +1,7 @@
 package com.pkukielka.stronghold.tower.archer
 
 import com.pkukielka.stronghold.effect.FireEffect
-import com.pkukielka.stronghold.enemy.{PathFinder, BaseEnemy}
+import com.pkukielka.stronghold.enemy.{PathFinder, Enemy}
 import com.pkukielka.stronghold.IsometricMapUtils
 
 class FireArrow extends Arrow {
@@ -12,7 +12,7 @@ class FireArrow extends Arrow {
     super.init(xStart, yStart, xEnd, yEnd, heightsDifference)
   }
 
-  override def update(deltaTime: Float, enemies: Array[BaseEnemy], pathFinder: PathFinder) {
+  override def update(deltaTime: Float, enemies: Array[Enemy], pathFinder: PathFinder) {
     super.update(deltaTime, enemies, pathFinder)
 
     if (isFireActive) {

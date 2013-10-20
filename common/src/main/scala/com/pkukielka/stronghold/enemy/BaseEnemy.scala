@@ -55,9 +55,9 @@ abstract class BaseEnemy(pathFinder: PathFinder) extends Enemy {
     }
   }
 
-  def isDead = life <= 0
+  override def isDead = life <= 0
 
-  def isHit(segmentStart: Vector2, segmentEnd: Vector2): Boolean = {
+  override def isHit(segmentStart: Vector2, segmentEnd: Vector2): Boolean = {
     isIntersectingPath(segmentStart, segmentEnd, position.x, position.y, position.x + width, position.y) ||
       isIntersectingPath(segmentStart, segmentEnd, position.x, position.y, position.x, position.y + height) ||
       isIntersectingPath(segmentStart, segmentEnd, position.x + width, position.y, position.x + width, position.y + height) ||

@@ -2,14 +2,13 @@ package com.pkukielka.stronghold
 
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import scala.collection.mutable.ArrayBuffer
 import com.badlogic.gdx.maps.tiled.TiledMap
 import scala.Array
 import com.pkukielka.stronghold.enemy.units._
-import com.pkukielka.stronghold.enemy.{BaseEnemy, EnemyRenderer, PathFinder}
+import com.pkukielka.stronghold.enemy._
 import com.pkukielka.stronghold.tower.{Tower, Attack}
 import com.badlogic.gdx.math.Vector2
 import com.pkukielka.stronghold.tower.archer.{ArcherTowerRenderer, ArcherTower}
@@ -28,7 +27,7 @@ class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: Strin
 
   pathFinder.update
 
-  private val enemies: Array[BaseEnemy with Renderer] = ArrayBuffer.fill(10)(Array(
+  private val enemies: Array[Enemy with Renderer] = ArrayBuffer.fill(10)(Array(
     new Skeleton with EnemyRenderer, new SkeletonArcher with EnemyRenderer,
     new SkeletonMage with EnemyRenderer, new SkeletonWeak with EnemyRenderer,
     new Goblin with EnemyRenderer, new EliteGoblin with EnemyRenderer,
@@ -59,10 +58,10 @@ class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: Strin
       enemy.update(delta)
     }
     for (bullet <- bullets) {
-      bullet.update(delta, enemies.asInstanceOf[Array[BaseEnemy]], pathFinder)
+      bullet.update(delta, enemies.asInstanceOf[Array[Enemy]], pathFinder)
     }
     for (tower <- towers) {
-      tower.update(delta, enemies.asInstanceOf[Array[BaseEnemy]], bullets)
+      tower.update(delta, enemies.asInstanceOf[Array[Enemy]], bullets)
     }
 
     batch.begin()
@@ -70,10 +69,10 @@ class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: Strin
       bullet.asInstanceOf[Renderer].draw(batch, delta)
     }
     for (o <- enemiesWithTowers) {
-      if (!o.isInstanceOf[BaseEnemy] || o.asInstanceOf[BaseEnemy].isDead) o.draw(batch, delta)
+      if (!o.isInstanceOf[Enemy] || o.asInstanceOf[Enemy].isDead) o.draw(batch, delta)
     }
     for (o <- enemiesWithTowers) {
-      if (!o.isInstanceOf[BaseEnemy] || !o.asInstanceOf[BaseEnemy].isDead) o.draw(batch, delta)
+      if (!o.isInstanceOf[Enemy] || !o.asInstanceOf[Enemy].isDead) o.draw(batch, delta)
     }
     for (bullet <- bullets if !bullet.isCompleted) {
       bullet.asInstanceOf[Renderer].draw(batch, delta)
