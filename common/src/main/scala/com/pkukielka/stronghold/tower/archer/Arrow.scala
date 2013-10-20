@@ -2,7 +2,7 @@ package com.pkukielka.stronghold.tower.archer
 
 import com.badlogic.gdx.math._
 import com.pkukielka.stronghold.tower.Attack
-import com.pkukielka.stronghold.enemy.{PathFinder, EnemyCore}
+import com.pkukielka.stronghold.enemy.{PathFinder, BaseEnemy}
 import com.pkukielka.stronghold.IsometricMapUtils
 
 object Arrow {
@@ -58,7 +58,7 @@ class Arrow extends Attack {
     direction.set(position).sub(previousPosition).nor()
   }
 
-  private def updateWorldState(enemies: Array[EnemyCore], pathFinder: PathFinder): Unit = {
+  private def updateWorldState(enemies: Array[BaseEnemy], pathFinder: PathFinder): Unit = {
     temp.p1.set(IsometricMapUtils.cameraToMapX(previousPosition), IsometricMapUtils.cameraToMapY(previousPosition))
     temp.p2.set(IsometricMapUtils.cameraToMapX(position), IsometricMapUtils.cameraToMapY(position))
     for (enemy <- enemies if !enemy.isDead && enemy.isHit(temp.p1, temp.p2)) {
@@ -71,7 +71,7 @@ class Arrow extends Attack {
     }
   }
 
-  def update(deltaTime: Float, enemies: Array[EnemyCore], pathFinder: PathFinder) {
+  def update(deltaTime: Float, enemies: Array[BaseEnemy], pathFinder: PathFinder) {
     if (!isCompleted) {
       time = (time + deltaTime).min(timeToComplete)
       updatePosition()

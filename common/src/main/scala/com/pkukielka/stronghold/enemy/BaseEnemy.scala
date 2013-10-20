@@ -3,7 +3,7 @@ package com.pkukielka.stronghold.enemy
 import com.badlogic.gdx.math.{Intersector, Vector2}
 import scala.language.implicitConversions
 
-abstract class EnemyCore(pathFinder: PathFinder) extends Enemy {
+abstract class BaseEnemy(pathFinder: PathFinder) extends Enemy {
   var animationTime = scala.math.random.toFloat
   var xOffset = (0.5f + (scala.math.random - 0.5f) / 4).toFloat
   var yOffset = (0.5f + (scala.math.random - 0.5f) / 4).toFloat

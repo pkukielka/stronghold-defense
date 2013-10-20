@@ -1,6 +1,6 @@
 package com.pkukielka.stronghold.tower.archer
 
-import com.pkukielka.stronghold.enemy.EnemyCore
+import com.pkukielka.stronghold.enemy.BaseEnemy
 import com.badlogic.gdx.math.Vector2
 import scala.collection.mutable.ArrayBuffer
 import com.pkukielka.stronghold.tower.{Attack, Tower}
@@ -17,11 +17,11 @@ class ArcherTower(val position: Vector2) extends Tower {
   var time = scala.math.random.toFloat
   var properties = version1
 
-  private def findNewTarget(enemies: Array[EnemyCore]) = enemies.minBy{ enemy=>
+  private def findNewTarget(enemies: Array[BaseEnemy]) = enemies.minBy{ enemy=>
     if (enemy.isDead) Int.MaxValue else enemy.position.dst(position)
   }
 
-  override def update(deltaTime: Float, enemies: Array[EnemyCore], bullets: ArrayBuffer[Attack]) {
+  override def update(deltaTime: Float, enemies: Array[BaseEnemy], bullets: ArrayBuffer[Attack]) {
     time += deltaTime
     if (time > properties.shootInterval) {
       time -= properties.shootInterval

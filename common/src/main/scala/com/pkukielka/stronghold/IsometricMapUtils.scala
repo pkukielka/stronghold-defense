@@ -1,6 +1,6 @@
 package com.pkukielka.stronghold
 
-import com.badlogic.gdx.math.{Vector3, Vector2, Matrix3}
+import com.badlogic.gdx.math.{Vector3, Vector2}
 import com.badlogic.gdx.graphics.OrthographicCamera
 
 object IsometricMapUtils {
