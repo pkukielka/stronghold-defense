@@ -1,21 +1,25 @@
 package com.pkukielka.stronghold.tower.archer
 
-import com.pkukielka.stronghold.enemy.BaseEnemy
+import com.pkukielka.stronghold.enemy.{PathFinder, BaseEnemy}
 import com.badlogic.gdx.math.Vector2
 import scala.collection.mutable.ArrayBuffer
 import com.pkukielka.stronghold.tower.{Attack, Tower}
+import com.pkukielka.stronghold.MapBuilder
 
 object ArcherTower {
   object version1 {
-    val shootInterval = 1f
+    val shootInterval = 0.3f
   }
 }
 
-class ArcherTower(val position: Vector2) extends Tower {
+class ArcherTower(val position: Vector2, pathFinder: PathFinder) extends Tower {
   import ArcherTower._
 
   var time = scala.math.random.toFloat
   var properties = version1
+
+  pathFinder.influencesManager.add(10000f, position, 100000, 10000, 4f)
+  pathFinder.update
 
   private def findNewTarget(enemies: Array[BaseEnemy]) = enemies.minBy{ enemy=>
     if (enemy.isDead) Int.MaxValue else enemy.position.dst(position)

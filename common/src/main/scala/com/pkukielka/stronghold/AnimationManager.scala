@@ -16,7 +16,6 @@ import com.pkukielka.stronghold.tower.archer.{ArcherTowerRenderer, ArcherTower}
 import com.pkukielka.stronghold.utils.Sorting
 
 class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: String) {
-  private val attack = Gdx.audio.newSound(Gdx.files.internal("data/sound/powers/shoot.ogg"))
   private val shapeRenderer = new ShapeRenderer()
 
   private val mapBuilder = new MapBuilder(map)
@@ -42,9 +41,9 @@ class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: Strin
   var enemiesWithTowers: ArrayBuffer[Renderer] = enemies.map(_.asInstanceOf[Renderer]).to[ArrayBuffer]
 
   def hit(x: Float, y: Float) {
-    attack.play()
-    val tower = new ArcherTower(new Vector2(IsometricMapUtils.cameraToMapX(x, y), IsometricMapUtils.cameraToMapY(x, y)))
-      with ArcherTowerRenderer
+    val tower = new ArcherTower(
+      new Vector2(IsometricMapUtils.cameraToMapX(x, y),
+        IsometricMapUtils.cameraToMapY(x, y)), pathFinder)  with ArcherTowerRenderer
     towers += tower
     enemiesWithTowers += tower
   }
@@ -59,28 +58,23 @@ class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: Strin
     for (enemy <- enemies) {
       enemy.update(delta)
     }
-
     for (bullet <- bullets) {
       bullet.update(delta, enemies.asInstanceOf[Array[BaseEnemy]], pathFinder)
     }
-
     for (tower <- towers) {
       tower.update(delta, enemies.asInstanceOf[Array[BaseEnemy]], bullets)
     }
 
     batch.begin()
-    for (o <- enemiesWithTowers) {
-      o.asInstanceOf[Renderer].draw(batch, delta)
-    }
-    batch.end()
-
-    batch.begin()
     for (bullet <- bullets if bullet.isCompleted) {
       bullet.asInstanceOf[Renderer].draw(batch, delta)
     }
-    batch.end()
-
-    batch.begin()
+    for (o <- enemiesWithTowers) {
+      if (!o.isInstanceOf[BaseEnemy] || o.asInstanceOf[BaseEnemy].isDead) o.draw(batch, delta)
+    }
+    for (o <- enemiesWithTowers) {
+      if (!o.isInstanceOf[BaseEnemy] || !o.asInstanceOf[BaseEnemy].isDead) o.draw(batch, delta)
+    }
     for (bullet <- bullets if !bullet.isCompleted) {
       bullet.asInstanceOf[Renderer].draw(batch, delta)
     }

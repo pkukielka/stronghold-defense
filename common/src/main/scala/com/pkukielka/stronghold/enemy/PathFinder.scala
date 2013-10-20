@@ -37,7 +37,6 @@ class PathFinder(val destination: Node, val map: MapBuilder, val influencesManag
 
   def getInfluence(node: Node) = influencesManager.getSum(map.node2posX(node), map.node2posY(node))
 
-
   def getNextStep(currentPosition: Vector2): Node = {
     @tailrec
     def findClosestNode(edges: List[Node], closestNode: Node): Node = {
