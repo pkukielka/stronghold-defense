@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 trait FireArrowRenderer extends ArrowRenderer {
   self: FireArrow =>
 
-  abstract override def draw(batch: SpriteBatch): Unit = {
-    super.draw(batch)
+  abstract override def draw(batch: SpriteBatch, deltaTime: Float): Unit = {
+    super.draw(batch, deltaTime)
 
     if (isFireActive) {
       if (fireEffect.isComplete) {

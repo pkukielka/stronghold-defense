@@ -9,10 +9,11 @@ import scala.collection.mutable.ArrayBuffer
 import com.badlogic.gdx.maps.tiled.TiledMap
 import scala.Array
 import com.pkukielka.stronghold.enemy.units._
-import com.pkukielka.stronghold.enemy.{EnemyCore, EnemyCoreRenderer, PathFinder}
-import com.pkukielka.stronghold.tower.{Tower, Attack, Renderer}
+import com.pkukielka.stronghold.enemy.{BaseEnemy, EnemyRenderer, PathFinder}
+import com.pkukielka.stronghold.tower.{Tower, Attack}
 import com.badlogic.gdx.math.Vector2
 import com.pkukielka.stronghold.tower.archer.{ArcherTowerRenderer, ArcherTower}
+import com.pkukielka.stronghold.utils.Sorting
 
 class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: String) {
   private val attack = Gdx.audio.newSound(Gdx.files.internal("data/sound/powers/shoot.ogg"))
@@ -23,25 +24,29 @@ class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: Strin
   private implicit val pathFinder = new PathFinder(mapBuilder.getNode(7, 29), mapBuilder, influencesManager)
 
   val bullets = ArrayBuffer.empty[Attack]
-  val towers = ArrayBuffer.empty[Tower]
+  val towers = ArrayBuffer.empty[Tower with Renderer]
   var totalTime = 0.0f
 
   pathFinder.update
 
-  private val enemies: Array[EnemyCore] = ArrayBuffer.fill(10)(Array(
-    new Skeleton with EnemyCoreRenderer, new SkeletonArcher with EnemyCoreRenderer,
-    new SkeletonMage with EnemyCoreRenderer, new SkeletonWeak with EnemyCoreRenderer,
-    new Goblin with EnemyCoreRenderer, new EliteGoblin with EnemyCoreRenderer,
-    new EarthAnt with EnemyCoreRenderer, new FireAnt with EnemyCoreRenderer, new IceAnt with EnemyCoreRenderer,
-    new Minotaur with EnemyCoreRenderer, new Stealth with EnemyCoreRenderer, new Zombie with EnemyCoreRenderer,
-    new WyvernWater with EnemyCoreRenderer, new WyvernFire with EnemyCoreRenderer,
-    new WyvernAir with EnemyCoreRenderer, new WyvernEarth with EnemyCoreRenderer
+  private val enemies: Array[BaseEnemy with Renderer] = ArrayBuffer.fill(10)(Array(
+    new Skeleton with EnemyRenderer, new SkeletonArcher with EnemyRenderer,
+    new SkeletonMage with EnemyRenderer, new SkeletonWeak with EnemyRenderer,
+    new Goblin with EnemyRenderer, new EliteGoblin with EnemyRenderer,
+    new EarthAnt with EnemyRenderer, new FireAnt with EnemyRenderer, new IceAnt with EnemyRenderer,
+    new Minotaur with EnemyRenderer, new Stealth with EnemyRenderer, new Zombie with EnemyRenderer,
+    new WyvernWater with EnemyRenderer, new WyvernFire with EnemyRenderer,
+    new WyvernAir with EnemyRenderer, new WyvernEarth with EnemyRenderer
   )).flatten.toArray
+
+  var enemiesWithTowers: ArrayBuffer[Renderer] = enemies.map(_.asInstanceOf[Renderer]).to[ArrayBuffer]
 
   def hit(x: Float, y: Float) {
     attack.play()
-    towers += new ArcherTower(new Vector2(IsometricMapUtils.cameraToMapX(x, y), IsometricMapUtils.cameraToMapY(x, y)))
+    val tower = new ArcherTower(new Vector2(IsometricMapUtils.cameraToMapX(x, y), IsometricMapUtils.cameraToMapY(x, y)))
       with ArcherTowerRenderer
+    towers += tower
+    enemiesWithTowers += tower
   }
 
   def update(batch: SpriteBatch, deltaTime: Float) {
@@ -49,54 +54,42 @@ class AnimationManager(camera: OrthographicCamera, map: TiledMap, mapName: Strin
 
     influencesManager.update(delta)
 
-    enemies.sortBy(_.position.y)
+    Sorting.sort(enemiesWithTowers, 0, enemiesWithTowers.length)
 
     for (enemy <- enemies) {
       enemy.update(delta)
     }
 
     for (bullet <- bullets) {
-      bullet.update(delta, enemies, pathFinder)
+      bullet.update(delta, enemies.asInstanceOf[Array[BaseEnemy]], pathFinder)
     }
 
     for (tower <- towers) {
-      tower.update(delta, enemies, bullets)
+      tower.update(delta, enemies.asInstanceOf[Array[BaseEnemy]], bullets)
     }
 
     batch.begin()
-    for (enemy <- enemies if enemy.isDead) {
-      enemy.asInstanceOf[EnemyCoreRenderer].drawModel(batch, delta)
+    for (o <- enemiesWithTowers) {
+      o.asInstanceOf[Renderer].draw(batch, delta)
     }
     batch.end()
 
     batch.begin()
     for (bullet <- bullets if bullet.isCompleted) {
-      bullet.asInstanceOf[Renderer].draw(batch)
-    }
-    batch.end()
-
-    batch.begin()
-    for (enemy <- enemies if !enemy.isDead) {
-      enemy.asInstanceOf[EnemyCoreRenderer].drawModel(batch, delta)
-    }
-    batch.end()
-
-    batch.begin()
-    for (tower <- towers) {
-      tower.asInstanceOf[Renderer].draw(batch)
+      bullet.asInstanceOf[Renderer].draw(batch, delta)
     }
     batch.end()
 
     batch.begin()
     for (bullet <- bullets if !bullet.isCompleted) {
-      bullet.asInstanceOf[Renderer].draw(batch)
+      bullet.asInstanceOf[Renderer].draw(batch, delta)
     }
     batch.end()
 
     shapeRenderer.setProjectionMatrix(camera.combined)
     shapeRenderer.begin(ShapeType.Filled)
     for (enemy <- enemies) {
-      enemy.asInstanceOf[EnemyCoreRenderer].drawLifeBar(shapeRenderer)
+      enemy.asInstanceOf[EnemyRenderer].drawLifeBar(shapeRenderer)
     }
     shapeRenderer.end()
   }

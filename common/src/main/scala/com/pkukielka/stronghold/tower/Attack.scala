@@ -1,9 +1,9 @@
 package com.pkukielka.stronghold.tower
 
-import com.pkukielka.stronghold.enemy.{PathFinder, EnemyCore}
+import com.pkukielka.stronghold.enemy.{PathFinder, BaseEnemy}
 
 trait Attack {
-  def update(deltaTime: Float, enemies: Array[EnemyCore], pathFinder: PathFinder): Unit
+  def update(deltaTime: Float, enemies: Array[BaseEnemy], pathFinder: PathFinder): Unit
 
   def isCompleted: Boolean
 }

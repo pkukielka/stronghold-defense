@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.pkukielka.stronghold.effect.FireEffect
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
 
-object EnemyCoreRenderer {
+object EnemyRenderer {
 
   object lifeBar {
     val width = 0.4f
@@ -18,10 +18,12 @@ object EnemyCoreRenderer {
 
 }
 
-trait EnemyCoreRenderer extends Enemy{
-  self: EnemyCore =>
+trait EnemyRenderer extends Enemy with com.pkukielka.stronghold.Renderer {
+  self: BaseEnemy =>
 
   var fireEffect: ParticleEffectPool#PooledEffect = null
+
+  override def depth = IsometricMapUtils.cameraToMapY(position)
 
   override def width: Float = currentFrame.getRegionWidth * IsometricMapUtils.unitScale
 
@@ -73,7 +75,7 @@ trait EnemyCoreRenderer extends Enemy{
   }
 
   def drawLifeBar(shapeRenderer: ShapeRenderer) {
-    import EnemyCoreRenderer.lifeBar
+    import EnemyRenderer.lifeBar
 
     if (!isDead && life != maxLife) {
       val x = IsometricMapUtils.mapToCameraX(position) + (width - lifeBar.width) / 2 + getXAdjustment
@@ -87,7 +89,7 @@ trait EnemyCoreRenderer extends Enemy{
     }
   }
 
-  def drawModel(batch: SpriteBatch, deltaTime: Float) {
+  override def draw(batch: SpriteBatch, deltaTime: Float) {
     batch.draw(currentFrame,
       IsometricMapUtils.mapToCameraX(position) + getXAdjustment,
       IsometricMapUtils.mapToCameraY(position) + getYAdjustment,
