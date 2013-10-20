@@ -40,7 +40,7 @@ class PathFinder(val destination: Node, val map: MapBuilder, val influencesManag
 
   def getNextStep(currentPosition: Vector2): Node = {
     @tailrec
-    def findClosestNode(edges: mutable.MutableList[Node], closestNode: Node): Node = {
+    def findClosestNode(edges: List[Node], closestNode: Node): Node = {
       if (edges.isEmpty) {
         return closestNode
       }

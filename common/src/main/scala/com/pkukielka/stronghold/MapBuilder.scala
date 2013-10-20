@@ -2,10 +2,8 @@ package com.pkukielka.stronghold
 
 import com.badlogic.gdx.maps.tiled.{TiledMapTileLayer, TiledMap}
 import com.badlogic.gdx.maps.MapProperties
-import scala.collection.mutable.MutableList
 import scala.collection.convert.WrapAsScala.asScalaIterator
 import com.badlogic.gdx.math.Vector2
-import scala.collection.mutable
 
 case class HeightMap(downLeft: Int, topLeft: Int, topRight: Int, downRight: Int) {
   def isGroundLevel: Boolean =
@@ -38,7 +36,7 @@ class MapBuilder(map: TiledMap) {
   val nodesCount = height * width
 
   val heights = Array.ofDim[HeightMap](width, height)
-  val edges = Array.fill[mutable.MutableList[(Node)]](nodesCount)(mutable.MutableList.empty[Node])
+  val edges = Array.fill[List[(Node)]](nodesCount)(List.empty[Node])
   val weights = Array.fill[Distance](nodesCount, nodesCount)(inf)
 
   {
@@ -91,8 +89,8 @@ class MapBuilder(map: TiledMap) {
     def setEdge(x1: Int, y1: Int)(x2: Int, y2: Int)(value: Int) = {
       val n1 = y1 * width + x1
       val n2 = y2 * width + x2
-      edges(n1) += n2
-      edges(n2) += n1
+      edges(n1) = n2 :: edges(n1)
+      edges(n2) = n1 :: edges(n2)
       weights(n1)(n2) = value
       weights(n2)(n1) = value
     }
