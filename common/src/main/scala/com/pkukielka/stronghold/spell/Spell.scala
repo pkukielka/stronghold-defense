@@ -4,43 +4,61 @@ import com.badlogic.gdx.math.Vector2
 import scala.collection.mutable.ArrayBuffer
 import com.pkukielka.stronghold.enemy.{Enemy, PathFinder}
 import com.pkukielka.stronghold.utils.Utils
+import com.pkukielka.stronghold.Influence
+import com.pkukielka.stronghold.assets.EffectGfxAssets
 
-class Glyph(val position: Vector2, pathFinder: PathFinder, attack: => Attack, attackProperties: AttackProperties) {
+abstract class Spell(pathFinder: PathFinder)  {
   var time = 0f
   var timeFromLastShoot = 0f
-  val lifeTime = 5f
-  val shootInterval = 1f
   var deactivated = false
-  val influence = pathFinder.influencesManager.add(10000f, position, 1000, 500, attackProperties.range)
+  var influence: Influence = null
+  val position = new Vector2()
 
   pathFinder.update
 
-  protected def isActive = time < lifeTime
-
-  protected def assets = attackProperties.assets
+  protected var isActive = false
 
   private val enemyDistance = (enemy: Enemy) => if (enemy.isDead) Int.MaxValue else enemy.position.dst(position)
+
+  def init(positionX: Float, positionY: Float) = {
+    time = 0f
+    timeFromLastShoot = 0f
+    position.set(positionX, positionY)
+    influence = pathFinder.influencesManager.add(10000f, position, 1000, 500, range)
+    isActive = true
+  }
+
+  def assets: EffectGfxAssets
+
+  def range: Float
+
+  def attack: Attack
+
+  def lifeTime: Float
+
+  def shootInterval: Float
 
   def update(deltaTime: Float, enemies: Array[Enemy], attacks: ArrayBuffer[Attack]) {
     time += deltaTime
 
-    if (isActive) {
+    if (time < lifeTime) {
       timeFromLastShoot += deltaTime
 
       if (timeFromLastShoot > shootInterval) {
         timeFromLastShoot -= shootInterval
 
         val target = Utils.minBy(enemies, enemyDistance)
-        if (!target.isDead && target.position.dst(position) < attackProperties.range) {
+        if (!target.isDead && target.position.dst(position) < range) {
           val newAttack = attack
           newAttack.init(position.x, position.y, target.position.x, target.position.y, 0)
           attacks += newAttack
         }
       }
     }
-    else if (!deactivated) {
-      deactivated = true
+    else if (isActive) {
+      isActive = false
       pathFinder.influencesManager.remove(influence)
+      influence = null
     }
   }
 }

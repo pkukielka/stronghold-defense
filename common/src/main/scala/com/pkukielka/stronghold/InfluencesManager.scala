@@ -48,8 +48,8 @@ class InfluencesManager(width: Int, height: Int) {
 
   def remove(influence: Influence) {
     influences -= influence
-    influencesPool.free(influence)
     updateField(influence, -influence.valueCenter, -influence.valueEdge)
+    influencesPool.free(influence)
   }
 
   def updateField(influence: Influence, valueCenter: Float, valueEdge: Float) {

@@ -1,4 +1,4 @@
-package com.pkukielka.stronghold.spell.archer
+package com.pkukielka.stronghold.spell.attacks.arrow
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, Sprite}

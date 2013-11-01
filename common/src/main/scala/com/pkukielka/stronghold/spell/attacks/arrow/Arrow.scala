@@ -1,12 +1,12 @@
-package com.pkukielka.stronghold.spell.archer
+package com.pkukielka.stronghold.spell.attacks.arrow
 
 import com.badlogic.gdx.math._
-import com.pkukielka.stronghold.spell.{AttackProperties, Attack}
+import com.pkukielka.stronghold.spell.{Attack}
 import com.pkukielka.stronghold.enemy.{PathFinder, Enemy}
 import com.pkukielka.stronghold.IsometricMapUtils
 import com.pkukielka.stronghold.assets.Assets
 
-object Arrow extends AttackProperties {
+object Arrow  {
   val maxMiss = 2f
   val range = 20f
   val baseDamage = 10f

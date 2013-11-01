@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.pkukielka.stronghold.{IsometricMapUtils, Renderer}
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
 
-trait GlyphRenderer extends Renderer {
-  self: Glyph =>
+trait SpellRenderer extends Renderer {
+  self: Spell =>
 
   protected def currentFrame = assets.effectAnimation.getKeyFrame(time, false)
 

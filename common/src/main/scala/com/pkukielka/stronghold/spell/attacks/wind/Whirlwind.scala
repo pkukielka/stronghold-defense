@@ -1,20 +1,14 @@
-package com.pkukielka.stronghold.spell.wind
+package com.pkukielka.stronghold.spell.attacks.wind
 
-import com.pkukielka.stronghold.spell.{AttackProperties, Attack}
+import com.pkukielka.stronghold.spell.Attack
 import com.pkukielka.stronghold.enemy.{PathFinder, Enemy}
 import com.badlogic.gdx.math.{Bezier, Vector2}
-import com.badlogic.gdx.audio.Sound
-import com.badlogic.gdx.Gdx
-import com.pkukielka.stronghold.assets.Assets
 
-object Whirlwind extends AttackProperties {
+object Whirlwind {
   val baseDamage = 20f
   val timeToComplete = 1.4f
   val range = 5f
   val rotationsPerSecond = 3
-  val assets = Assets.spellWind2
-
-  val sound = Gdx.audio.newSound(Gdx.files.internal("data/sound/powers/whirlwind.ogg"))
 }
 
 class Whirlwind extends Attack {
@@ -32,6 +26,8 @@ class Whirlwind extends Attack {
   import Whirlwind._
 
   def init(xStart: Float, yStart: Float, xEnd: Float, yEnd: Float, heightsDifference: Float) {
+    time = 0f
+
     temp.start.set(xStart, yStart)
     temp.target.set(xEnd, yEnd).sub(temp.start).nor.scl(range)
     temp.middle.set(temp.target).div(2f).rotate(60f - (scala.math.random.toFloat * 120f)).add(temp.start)
@@ -39,7 +35,6 @@ class Whirlwind extends Attack {
 
     path.set(temp.start, temp.middle, temp.target)
     position.set(temp.start)
-    sound.play()
   }
 
   def update(deltaTime: Float, enemies: Array[Enemy], pathFinder: PathFinder): Unit = {

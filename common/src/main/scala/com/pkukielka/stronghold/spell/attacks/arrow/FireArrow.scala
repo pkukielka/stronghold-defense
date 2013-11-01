@@ -1,4 +1,4 @@
-package com.pkukielka.stronghold.spell.archer
+package com.pkukielka.stronghold.spell.attacks.arrow
 
 import com.pkukielka.stronghold.effect.FireEffect
 import com.pkukielka.stronghold.enemy.{PathFinder, Enemy}

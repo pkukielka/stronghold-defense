@@ -3,7 +3,7 @@ package com.pkukielka.stronghold
 import com.pkukielka.stronghold.enemy._
 import com.pkukielka.stronghold.enemy.units._
 import com.pkukielka.stronghold.spell._
-import com.pkukielka.stronghold.utils.Sorting
+import com.pkukielka.stronghold.utils.{Poolable, Sorting}
 import scala.Array
 import scala.collection.mutable.ArrayBuffer
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -11,9 +11,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.maps.tiled.TiledMap
-import com.badlogic.gdx.math.Vector2
 import com.pkukielka.stronghold.enemy.features.flammable.{FlammableRenderer, FlammableCore}
-import com.pkukielka.stronghold.spell.wind.{WhirlwindRenderer, Whirlwind}
+import com.pkukielka.stronghold.spell.attacks.wind.{WhirlwindRenderer, Whirlwind, WhirlwindSpell}
+import com.badlogic.gdx.utils.Pool
 
 class AnimationManager(batch: SpriteBatch, camera: OrthographicCamera, map: TiledMap, mapName: String) {
   private val shapeRenderer = new ShapeRenderer()
@@ -22,8 +22,25 @@ class AnimationManager(batch: SpriteBatch, camera: OrthographicCamera, map: Tile
   private implicit val influencesManager = new InfluencesManager(mapBuilder.width, mapBuilder.height)
   private implicit val pathFinder = new PathFinder(mapBuilder.getNode(7, 29), mapBuilder, influencesManager)
 
+  object Pools {
+    val whirlwindAttack = new Pool[Whirlwind with WhirlwindRenderer] {
+      val that = this
+      def newObject() = new Whirlwind with WhirlwindRenderer
+        with Poolable[Whirlwind with WhirlwindRenderer] {
+          def free(instance: Whirlwind with WhirlwindRenderer): Unit = that.free(instance)
+        }
+    }
+    val whirlwindSpell = new Pool[WhirlwindSpell with SpellRenderer] {
+      val that = this
+      def newObject() = new WhirlwindSpell(pathFinder, whirlwindAttack.obtain()) with SpellRenderer
+        with Poolable[WhirlwindSpell with SpellRenderer] {
+          def free(instance: WhirlwindSpell with SpellRenderer): Unit = that.free(instance)
+        }
+    }
+  }
+
   val bullets = ArrayBuffer.empty[Attack]
-  val glyphs = ArrayBuffer.empty[Glyph with Renderer]
+  val glyphs = ArrayBuffer.empty[Spell with Renderer]
   var totalTime = 0.0f
   var delta = 0.0f
 
@@ -44,16 +61,15 @@ class AnimationManager(batch: SpriteBatch, camera: OrthographicCamera, map: Tile
   var renderers: ArrayBuffer[Renderer] = enemies.map(_.asInstanceOf[Renderer]).to[ArrayBuffer]
 
   def hit(x: Float, y: Float) {
-    val glyph = new Glyph(
-      new Vector2(IsometricMapUtils.cameraToMapX(x, y), IsometricMapUtils.cameraToMapY(x, y)),
-        pathFinder, new Whirlwind with WhirlwindRenderer, Whirlwind) with GlyphRenderer
+    val glyph = Pools.whirlwindSpell.obtain()
+    glyph.init(IsometricMapUtils.cameraToMapX(x, y), IsometricMapUtils.cameraToMapY(x, y))
     glyphs += glyph
     renderers += glyph
   }
 
   private val updateEnemy = (enemy: Enemy) => enemy.update(delta)
   private val updateAttacks = (attack: Attack) => attack.update(delta, enemies.asInstanceOf[Array[Enemy]], pathFinder)
-  private val updateGlyphs = (glyph: Glyph) => glyph.update(delta, enemies.asInstanceOf[Array[Enemy]], bullets)
+  private val updateGlyphs = (glyph: Spell) => glyph.update(delta, enemies.asInstanceOf[Array[Enemy]], bullets)
   private val renderCompletedAttacks = (attack: Attack) => if (attack.isCompleted) attack.asInstanceOf[Renderer].draw(batch, delta)
   private val isDeadEnemy = (obj: Renderer) => obj.isInstanceOf[Enemy] && obj.asInstanceOf[Enemy].isDead
   private val renderDeadEnemies = (obj: Renderer) => if (isDeadEnemy(obj)) obj.draw(batch, delta)
