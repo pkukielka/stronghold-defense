@@ -6,6 +6,7 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 import com.pkukielka.stronghold.{InfluencesManager, MapBuilder}
 import com.pkukielka.stronghold.MapBuilder._
+import com.pkukielka.stronghold.utils.Utils
 
 class PathFinder(val destination: Node, val map: MapBuilder, val influencesManager: InfluencesManager) {
 
@@ -37,17 +38,18 @@ class PathFinder(val destination: Node, val map: MapBuilder, val influencesManag
 
   def getInfluence(node: Node) = influencesManager.getSum(map.node2posX(node), map.node2posY(node))
 
-  def getNextStep(currentPosition: Vector2): Node = {
-    @tailrec
-    def findClosestNode(edges: List[Node], closestNode: Node): Node = {
-      if (edges.isEmpty) {
-        return closestNode
-      }
+  @tailrec
+  private def findClosestNode(edges: List[Node], closestNode: Node): Node = {
+    if (edges.isEmpty) {
+      closestNode
+    }
+    else {
       findClosestNode(edges.tail, if (distances(edges.head) < distances(closestNode)) edges.head else closestNode)
     }
-
-    findClosestNode(map.edges(map.getNode(currentPosition)).tail, map.edges(map.getNode(currentPosition)).head)
   }
+
+  def getNextStep(currentPosition: Vector2): Node =
+    findClosestNode(map.edges(map.getNode(currentPosition)).tail, map.edges(map.getNode(currentPosition)).head)
 
   def findShortestPathsTo(destination: Node) = {
     for (i <- distances.indices) distances(i) = inf

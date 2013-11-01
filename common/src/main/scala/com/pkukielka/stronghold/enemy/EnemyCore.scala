@@ -3,19 +3,14 @@ package com.pkukielka.stronghold.enemy
 import com.badlogic.gdx.math.{Intersector, Vector2}
 import scala.language.implicitConversions
 
-abstract class BaseEnemy(pathFinder: PathFinder) extends Enemy {
+abstract class EnemyCore(pathFinder: PathFinder) extends Enemy {
   var animationTime = scala.math.random.toFloat
-  var xOffset = (0.5f + (scala.math.random - 0.5f) / 4).toFloat
-  var yOffset = (0.5f + (scala.math.random - 0.5f) / 4).toFloat
+  val xOffset = (0.5f + (scala.math.random - 0.5f) / 4).toFloat
+  val yOffset = (0.5f + (scala.math.random - 0.5f) / 4).toFloat
   val position =  pathFinder.getFreePosition.add(xOffset, yOffset)
-  var directionVector = new Vector2()
+  val directionVector = new Vector2()
   var life = maxLife
-
-  object OnFire {
-    var isActive = false
-    var timeLeft = 0f
-    var damagePerSecond = 0f
-  }
+  var isHold = false
 
   object temp {
     val p1, p2, intersection = new Vector2()
@@ -24,12 +19,6 @@ abstract class BaseEnemy(pathFinder: PathFinder) extends Enemy {
   override def width: Float = 1f
 
   override def height: Float = 1f
-
-  override def setOnFire(time: Float, damagePerSecond: Float) {
-    OnFire.isActive = true
-    OnFire.timeLeft = time
-    OnFire.damagePerSecond = damagePerSecond
-  }
 
   override def die() {
     animationTime = 0
@@ -64,26 +53,15 @@ abstract class BaseEnemy(pathFinder: PathFinder) extends Enemy {
       isIntersectingPath(segmentStart, segmentEnd, position.x, position.y + height, position.x + width, position.y + height)
   }
 
-  def update(deltaTime: Float) {
+  override def update(deltaTime: Float) {
     if (deltaTime < 0.10) {
       animationTime += deltaTime
 
-      if (OnFire.isActive) {
-        import OnFire._
-
-        timeLeft -= deltaTime
-        hit(deltaTime * damagePerSecond)
-
-        if (timeLeft <= 0) {
-          timeLeft = 0f
-          isActive = false
-          damagePerSecond = 0f
-        }
-      }
-
-      if (!isDead) {
+      if (!isDead && !isHold) {
         move(deltaTime)
       }
+
+      isHold = false
     }
   }
 

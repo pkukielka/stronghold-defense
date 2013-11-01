@@ -1,4 +1,4 @@
-package com.pkukielka.stronghold.tower.archer
+package com.pkukielka.stronghold.spell.archer
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 

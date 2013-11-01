@@ -1,17 +1,19 @@
-package com.pkukielka.stronghold.tower.archer
+package com.pkukielka.stronghold.spell.archer
 
 import com.badlogic.gdx.math._
-import com.pkukielka.stronghold.tower.Attack
+import com.pkukielka.stronghold.spell.{AttackProperties, Attack}
 import com.pkukielka.stronghold.enemy.{PathFinder, Enemy}
 import com.pkukielka.stronghold.IsometricMapUtils
+import com.pkukielka.stronghold.assets.Assets
 
-object Arrow {
+object Arrow extends AttackProperties {
   val maxMiss = 2f
-  val maxRange = 20f
-  val baseDamage = 30f
-  val randomDamage = 50f
+  val range = 20f
+  val baseDamage = 10f
+  val randomDamage = 20f
   val velocity = 20f
   val heightRangeIncrease = 1.2f
+  val assets = Assets.spellSpecial2
 }
 
 class Arrow extends Attack {
@@ -37,8 +39,8 @@ class Arrow extends Attack {
     this.heightsDifference = heightsDifference
 
     val distance = position.dst(temp.target)
-    val currentMiss = (distance / maxRange) * maxMiss
-    val heightAddition = (distance / maxRange) * distance * 0.5f
+    val currentMiss = (distance / range) * maxMiss
+    val heightAddition = (distance / range) * distance * 0.5f
 
     temp.target.add(((0.5 - scala.math.random) * currentMiss).toFloat, ((0.5 - scala.math.random) * currentMiss).toFloat)
     temp.middle.set(position).add(temp.target).scl(0.5f).add(0, heightAddition)
@@ -62,10 +64,6 @@ class Arrow extends Attack {
     temp.p2.set(IsometricMapUtils.cameraToMapX(position), IsometricMapUtils.cameraToMapY(position))
     for (enemy <- enemies if !enemy.isDead && enemy.isHit(temp.p1, temp.p2)) {
       enemy.hit((baseDamage + scala.math.random * randomDamage).toInt)
-      if (enemy.isDead) {
-        pathFinder.influencesManager.add(10000f, enemy.position, 1000f, 200, 3f)
-        pathFinder.update
-      }
       return
     }
   }

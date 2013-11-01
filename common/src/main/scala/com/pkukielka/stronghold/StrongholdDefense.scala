@@ -46,7 +46,7 @@ class StrongholdDefense extends Game {
 
     if (!isLoaded) {
       if (Assets.update()) {
-        animationManager = new AnimationManager(camera, map, "test")
+        animationManager = new AnimationManager(renderer.getSpriteBatch, camera, map, "test")
 
         val inputCamController = new InputCamController(camera)
         val gestureCamController = new GestureDetector(new GestureCamController(camera, animationManager.hit))
@@ -65,7 +65,7 @@ class StrongholdDefense extends Game {
     camera.update()
     renderer.setView(camera)
     renderer.render()
-    animationManager.update(renderer.getSpriteBatch, Gdx.graphics.getDeltaTime)
+    animationManager.update(Gdx.graphics.getDeltaTime)
 
     batch.begin()
     font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond, 10, 20)

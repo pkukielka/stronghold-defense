@@ -6,9 +6,13 @@ import com.badlogic.gdx.math.Vector2
 trait Enemy {
   def position: Vector2
 
+  var isHold: Boolean
+
   def isDead: Boolean
 
   def assets: EnemyAssets
+
+  def directionVector: Vector2
 
   def width: Float
 
@@ -25,8 +29,6 @@ trait Enemy {
   def harm(damage: Float): Unit
 
   def turn(): Unit
-
-  def setOnFire(time: Float, damagePerSecond: Float) : Unit
 
   def update(deltaTime: Float)
 }

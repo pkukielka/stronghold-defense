@@ -1,11 +1,10 @@
 package com.pkukielka.stronghold.enemy
 
-import com.badlogic.gdx.graphics.g2d.{ParticleEffectPool, SpriteBatch, TextureRegion}
 import com.pkukielka.stronghold.IsometricMapUtils
+import com.badlogic.gdx.graphics.g2d.{SpriteBatch, TextureRegion}
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.Color
-import com.pkukielka.stronghold.effect.FireEffect
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
 
 object EnemyRenderer {
 
@@ -19,9 +18,7 @@ object EnemyRenderer {
 }
 
 trait EnemyRenderer extends Enemy with com.pkukielka.stronghold.Renderer {
-  self: BaseEnemy =>
-
-  var fireEffect: ParticleEffectPool#PooledEffect = null
+  self: EnemyCore =>
 
   override def depth = IsometricMapUtils.cameraToMapY(position)
 
@@ -48,7 +45,7 @@ trait EnemyRenderer extends Enemy with com.pkukielka.stronghold.Renderer {
     }
   }
 
-  private def currentFrame: TextureRegion = {
+  protected def currentFrame: TextureRegion = {
     if (isDead) {
       assets.gfx.dieAnimations(angle).getKeyFrame(animationTime, false)
     }
@@ -59,20 +56,9 @@ trait EnemyRenderer extends Enemy with com.pkukielka.stronghold.Renderer {
 
   private def angle = (((247.5 - Math.toDegrees(Math.atan2(directionVector.y, directionVector.x))) % 360) / 45).toInt
 
-  private def getXAdjustment = -0.5f + currentFrame.asInstanceOf[AtlasRegion].offsetX * IsometricMapUtils.unitScale
+  protected def getXAdjustment = currentFrame.asInstanceOf[AtlasRegion].offsetX * IsometricMapUtils.unitScale - 0.5f
 
-  private def getYAdjustment = -0.5f + currentFrame.asInstanceOf[AtlasRegion].offsetY * IsometricMapUtils.unitScale
-
-  abstract override def setOnFire(time: Float, damagePerSecond: Float) {
-    super.setOnFire(time, damagePerSecond)
-
-    if (fireEffect == null) {
-      fireEffect = FireEffect.obtain
-    }
-
-    fireEffect.setDuration((time * 1000).toInt)
-    fireEffect.reset()
-  }
+  protected def getYAdjustment = currentFrame.asInstanceOf[AtlasRegion].offsetY * IsometricMapUtils.unitScale - 0.5f
 
   def drawLifeBar(shapeRenderer: ShapeRenderer) {
     import EnemyRenderer.lifeBar
@@ -94,19 +80,5 @@ trait EnemyRenderer extends Enemy with com.pkukielka.stronghold.Renderer {
       IsometricMapUtils.mapToCameraX(position) + getXAdjustment,
       IsometricMapUtils.mapToCameraY(position) + getYAdjustment,
       width, height)
-
-    if (fireEffect != null) {
-      if (fireEffect.isComplete) {
-        fireEffect.free()
-        fireEffect = null
-      }
-      else {
-        fireEffect.setPosition(
-          IsometricMapUtils.mapToCameraX(position) + width * 0.5f + getXAdjustment,
-          IsometricMapUtils.mapToCameraY(position) + height * 0.5f + getYAdjustment)
-        fireEffect.draw(batch, deltaTime)
-      }
-    }
   }
-
 }

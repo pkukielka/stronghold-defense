@@ -67,10 +67,10 @@ class InfluencesManager(width: Int, height: Int) {
 
   def getSum(x: Int, y: Int): Int = influencesField(x)(y)
 
+  private val removeExpired = (influence: Influence) => if (influence.endTime < currentTime) remove(influence)
+
   def update(deltaTime: Float) {
     currentTime += deltaTime
-    for (influence <- influences if influence.endTime < currentTime) {
-      remove(influence)
-    }
+    influences.foreach(removeExpired)
   }
 }
