@@ -7,7 +7,7 @@ object Main {
     val cfg = new LwjglApplicationConfiguration()
     cfg.title = "Stronghold Defense"
     cfg.height = 600
-    cfg.width = 800
+    cfg.width = 960
     cfg.useGL20 = true
     new LwjglApplication(new StrongholdDefense(), cfg)
   }

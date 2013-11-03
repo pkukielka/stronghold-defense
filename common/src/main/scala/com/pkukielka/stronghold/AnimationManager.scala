@@ -6,7 +6,7 @@ import com.pkukielka.stronghold.spell._
 import com.pkukielka.stronghold.utils.{Poolable, Sorting}
 import scala.Array
 import scala.collection.mutable.ArrayBuffer
-import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.{Texture, OrthographicCamera}
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
@@ -14,10 +14,12 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import com.pkukielka.stronghold.enemy.features.flammable.{FlammableRenderer, FlammableCore}
 import com.pkukielka.stronghold.spell.attacks.wind.{WhirlwindRenderer, Whirlwind, WhirlwindSpell}
 import com.badlogic.gdx.utils.Pool
+import com.badlogic.gdx.Gdx
 
 class AnimationManager(batch: SpriteBatch, camera: OrthographicCamera, map: TiledMap, mapName: String) {
+  private val menu = new Menu()
+  private val fog = new Texture(Gdx.files.internal("data/textures/fog.png"))
   private val shapeRenderer = new ShapeRenderer()
-
   private val mapBuilder = new MapBuilder(map)
   private implicit val influencesManager = new InfluencesManager(mapBuilder.width, mapBuilder.height)
   private implicit val pathFinder = new PathFinder(mapBuilder.getNode(7, 29), mapBuilder, influencesManager)
@@ -99,5 +101,12 @@ class AnimationManager(batch: SpriteBatch, camera: OrthographicCamera, map: Tile
     shapeRenderer.begin(ShapeType.Filled)
     enemies.foreach(renderLifeBar)
     shapeRenderer.end()
+
+    // Hackish fog of war
+    batch.begin()
+    batch.draw(fog, -1, -7.5f, 32, 16)
+    batch.end()
+
+    menu.updateAndDraw(delta)
   }
 }
