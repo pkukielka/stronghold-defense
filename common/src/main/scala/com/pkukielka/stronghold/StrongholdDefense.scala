@@ -18,6 +18,7 @@ class StrongholdDefense extends Game {
   private var batch: SpriteBatch = null
 
   private var splash: Texture = null
+  private var fog: Texture = null
   private var animationManager: AnimationManager = null
 
   private var isLoaded = false
@@ -38,10 +39,11 @@ class StrongholdDefense extends Game {
     IsometricMapUtils.init(camera, unitScale, tiledMapLayer.getTileWidth, tiledMapLayer.getHeight)
 
     splash = new Texture(Gdx.files.internal("data/textures/splash.png"))
+    fog = new Texture(Gdx.files.internal("data/textures/fog.png"))
   }
 
   override def render() {
-    Gdx.gl.glClearColor(0.55f, 0.55f, 0.55f, 1f)
+    Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 1f)
     Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT)
 
     if (!isLoaded) {
@@ -66,6 +68,11 @@ class StrongholdDefense extends Game {
     renderer.setView(camera)
     renderer.render()
     animationManager.update(Gdx.graphics.getDeltaTime)
+
+    // Hackish fog of war
+    renderer.getSpriteBatch.begin()
+    renderer.getSpriteBatch.draw(fog, -1, -7.5f, 32, 16)
+    renderer.getSpriteBatch.end()
 
     batch.begin()
     font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond, 10, 20)

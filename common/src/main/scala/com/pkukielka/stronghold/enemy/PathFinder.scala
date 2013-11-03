@@ -6,7 +6,6 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 import com.pkukielka.stronghold.{InfluencesManager, MapBuilder}
 import com.pkukielka.stronghold.MapBuilder._
-import com.pkukielka.stronghold.utils.Utils
 
 class PathFinder(val destination: Node, val map: MapBuilder, val influencesManager: InfluencesManager) {
 
