@@ -22,9 +22,9 @@ trait EnemyRenderer extends Enemy with com.pkukielka.stronghold.Renderer {
 
   override def depth = IsometricMapUtils.cameraToMapY(position)
 
-  override def width: Float = currentFrame.getRegionWidth * IsometricMapUtils.unitScale
+  override def width: Float = currentFrame.getRegionWidth * IsometricMapUtils.unitScale * baseSize
 
-  override def height: Float = currentFrame.getRegionHeight * IsometricMapUtils.unitScale
+  override def height: Float = currentFrame.getRegionHeight * IsometricMapUtils.unitScale * baseSize
 
   abstract override def die() {
     super.die()

@@ -5,6 +5,7 @@ import scala.language.implicitConversions
 
 abstract class EnemyCore(pathFinder: PathFinder) extends Enemy {
   var animationTime = scala.math.random.toFloat
+  val baseSize = (1.0f - (scala.math.random * 0.2f)).toFloat
   val xOffset = (0.5f + (scala.math.random - 0.5f) / 4).toFloat
   val yOffset = (0.5f + (scala.math.random - 0.5f) / 4).toFloat
   val position = pathFinder.getFreePosition.add(xOffset, yOffset)
@@ -16,9 +17,9 @@ abstract class EnemyCore(pathFinder: PathFinder) extends Enemy {
     val p1, p2, intersection = new Vector2()
   }
 
-  override def width: Float = 1f
+  override def width: Float = baseSize
 
-  override def height: Float = 1f
+  override def height: Float = baseSize
 
   override def die() {
     animationTime = 0

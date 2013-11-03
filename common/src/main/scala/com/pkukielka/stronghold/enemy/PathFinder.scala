@@ -48,7 +48,7 @@ class PathFinder(val destination: Node, val map: MapBuilder, val influencesManag
   }
 
   def getNextStep(currentPosition: Vector2): Node = {
-    if (map.edges(map.getNode(currentPosition)).isEmpty) {
+    if (map.getNode(currentPosition) >= map.edges.size || map.getNode(currentPosition) < 0 || map.edges(map.getNode(currentPosition)).isEmpty) {
       map.getNode(currentPosition)
     }
     else {
