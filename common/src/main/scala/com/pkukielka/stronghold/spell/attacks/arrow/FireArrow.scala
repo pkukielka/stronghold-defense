@@ -13,8 +13,8 @@ class FireArrow extends Arrow {
     super.init(xStart, yStart, xEnd, yEnd, heightsDifference)
   }
 
-  override def update(deltaTime: Float, enemies: Array[Enemy], pathFinder: PathFinder) {
-    super.update(deltaTime, enemies, pathFinder)
+  override def update(deltaTime: Float, enemies: Array[Enemy]) {
+    super.update(deltaTime, enemies)
 
     if (isFireActive) {
       fireEffect.update(deltaTime)

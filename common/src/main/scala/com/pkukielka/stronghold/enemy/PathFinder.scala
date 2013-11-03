@@ -47,8 +47,15 @@ class PathFinder(val destination: Node, val map: MapBuilder, val influencesManag
     }
   }
 
-  def getNextStep(currentPosition: Vector2): Node =
-    findClosestNode(map.edges(map.getNode(currentPosition)).tail, map.edges(map.getNode(currentPosition)).head)
+  def getNextStep(currentPosition: Vector2): Node = {
+    if (map.edges(map.getNode(currentPosition)).isEmpty) {
+      map.getNode(currentPosition)
+    }
+    else {
+      findClosestNode(map.edges(map.getNode(currentPosition)).tail, map.edges(map.getNode(currentPosition)).head)
+    }
+  }
+
 
   def findShortestPathsTo(destination: Node) = {
     for (i <- distances.indices) distances(i) = inf

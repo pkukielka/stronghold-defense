@@ -37,7 +37,7 @@ class Whirlwind extends Attack {
     position.set(temp.start)
   }
 
-  def update(deltaTime: Float, enemies: Array[Enemy], pathFinder: PathFinder): Unit = {
+  def update(deltaTime: Float, enemies: Array[Enemy]): Unit = {
     if (!isCompleted) {
       time = (time + deltaTime).min(timeToComplete)
       temp.delta.set(position)
@@ -49,11 +49,6 @@ class Whirlwind extends Attack {
         enemy.position.add(temp.delta)
         enemy.directionVector.rotate(360 * rotationsPerSecond * deltaTime)
         enemy.isHold = true
-
-        if (!pathFinder.hasConnections(enemy.position.x.toInt, enemy.position.y.toInt))
-        {
-          enemy.hit(1000)
-        }
         return
       }
     }

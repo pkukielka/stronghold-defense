@@ -7,7 +7,7 @@ abstract class EnemyCore(pathFinder: PathFinder) extends Enemy {
   var animationTime = scala.math.random.toFloat
   val xOffset = (0.5f + (scala.math.random - 0.5f) / 4).toFloat
   val yOffset = (0.5f + (scala.math.random - 0.5f) / 4).toFloat
-  val position =  pathFinder.getFreePosition.add(xOffset, yOffset)
+  val position = pathFinder.getFreePosition.add(xOffset, yOffset)
   val directionVector = new Vector2()
   var life = maxLife
   var isHold = false
@@ -57,7 +57,7 @@ abstract class EnemyCore(pathFinder: PathFinder) extends Enemy {
     if (deltaTime < 0.10) {
       animationTime += deltaTime
 
-      if (!isDead && !isHold) {
+      if (!isDead) {
         move(deltaTime)
       }
 
@@ -76,15 +76,21 @@ abstract class EnemyCore(pathFinder: PathFinder) extends Enemy {
   private def move(deltaTime: Float) {
     val next = pathFinder.getNextStep(position)
 
-    directionVector.set(
-      pathFinder.map.node2posX(next) + xOffset - position.x,
-      pathFinder.map.node2posY(next) + yOffset - position.y
-    ).nor().scl(velocity * deltaTime)
+    // TODO: This is safety check, but we should try to make it unnecessary
+    if (next == pathFinder.map.getNode(position)) {
+      hit(1000)
+    }
+    else if (!isHold) {
+      directionVector.set(
+        pathFinder.map.node2posX(next) + xOffset - position.x,
+        pathFinder.map.node2posY(next) + yOffset - position.y
+      ).nor().scl(velocity * deltaTime)
 
-    position.add(directionVector)
+      position.add(directionVector)
 
-    if (position.epsilonEquals(pathFinder.target, 1f)) {
-      turn()
+      if (position.epsilonEquals(pathFinder.target, 1f)) {
+        turn()
+      }
     }
   }
 

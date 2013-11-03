@@ -68,7 +68,7 @@ class AnimationManager(batch: SpriteBatch, camera: OrthographicCamera, map: Tile
   }
 
   private val updateEnemy = (enemy: Enemy) => enemy.update(delta)
-  private val updateAttacks = (attack: Attack) => attack.update(delta, enemies.asInstanceOf[Array[Enemy]], pathFinder)
+  private val updateAttacks = (attack: Attack) => attack.update(delta, enemies.asInstanceOf[Array[Enemy]])
   private val updateGlyphs = (glyph: Spell) => glyph.update(delta, enemies.asInstanceOf[Array[Enemy]], bullets)
   private val renderCompletedAttacks = (attack: Attack) => if (attack.isCompleted) attack.asInstanceOf[Renderer].draw(batch, delta)
   private val isDeadEnemy = (obj: Renderer) => obj.isInstanceOf[Enemy] && obj.asInstanceOf[Enemy].isDead
