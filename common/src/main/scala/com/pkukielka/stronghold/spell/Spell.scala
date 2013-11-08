@@ -10,6 +10,7 @@ import com.pkukielka.stronghold.assets.EffectGfxAssets
 abstract class Spell(pathFinder: PathFinder)  {
   var time = 0f
   var timeFromLastShoot = 0f
+  var currentShootInterval = shootInterval
   var deactivated = false
   var influence: Influence = null
   val position = new Vector2()
@@ -38,21 +39,25 @@ abstract class Spell(pathFinder: PathFinder)  {
 
   def shootInterval: Float
 
+  def targetAttack(enemies: Array[Enemy], attacks: ArrayBuffer[Attack]) {
+    val target = Utils.minBy(enemies, enemyDistance)
+    if (!target.isDead && target.position.dst(position) < range) {
+      val newAttack = attack
+      newAttack.init(position.x, position.y, target.position.x, target.position.y, 0)
+      attacks += newAttack
+    }
+  }
+
   def update(deltaTime: Float, enemies: Array[Enemy], attacks: ArrayBuffer[Attack]) {
     time += deltaTime
 
     if (time < lifeTime) {
       timeFromLastShoot += deltaTime
 
-      if (timeFromLastShoot > shootInterval) {
-        timeFromLastShoot -= shootInterval
-
-        val target = Utils.minBy(enemies, enemyDistance)
-        if (!target.isDead && target.position.dst(position) < range) {
-          val newAttack = attack
-          newAttack.init(position.x, position.y, target.position.x, target.position.y, 0)
-          attacks += newAttack
-        }
+      if (timeFromLastShoot > currentShootInterval) {
+        timeFromLastShoot -= currentShootInterval
+        currentShootInterval = shootInterval
+        targetAttack(enemies, attacks)
       }
     }
     else if (isActive) {

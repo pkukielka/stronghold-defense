@@ -20,7 +20,7 @@ trait SpellRenderer extends Renderer {
   protected def getYAdjustment = currentFrame.asInstanceOf[AtlasRegion].offsetY * IsometricMapUtils.unitScale - 0.5f
 
   override def draw(batch: SpriteBatch, deltaTime: Float): Unit = {
-    if (!assets.effectAnimation.isAnimationFinished(time)) {
+    if (assets != null && !assets.effectAnimation.isAnimationFinished(time)) {
       batch.draw(currentFrame,
         IsometricMapUtils.mapToCameraX(position) + getXAdjustment,
         IsometricMapUtils.mapToCameraY(position) + getYAdjustment,

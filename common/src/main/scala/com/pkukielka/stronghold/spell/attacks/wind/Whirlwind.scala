@@ -1,7 +1,7 @@
 package com.pkukielka.stronghold.spell.attacks.wind
 
 import com.pkukielka.stronghold.spell.Attack
-import com.pkukielka.stronghold.enemy.{PathFinder, Enemy}
+import com.pkukielka.stronghold.enemy.Enemy
 import com.badlogic.gdx.math.{Bezier, Vector2}
 
 object Whirlwind {
