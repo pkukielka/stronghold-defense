@@ -8,6 +8,7 @@ import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer
 import com.badlogic.gdx.input.GestureDetector
 import scala.language.implicitConversions
 import com.pkukielka.stronghold.assets.Assets
+import com.badlogic.gdx.audio.Music
 
 class StrongholdDefense extends Game {
 
@@ -19,6 +20,7 @@ class StrongholdDefense extends Game {
 
   private var splash: Texture = null
   private var animationManager: AnimationManager = null
+  private var music: Music = null
 
   private var isLoaded = false
 
@@ -53,6 +55,11 @@ class StrongholdDefense extends Game {
         Gdx.input.setInputProcessor(new InputMultiplexer(Gdx.input.getInputProcessor(), gestureCamController, inputCamController))
 
         isLoaded = true
+
+        music = Gdx.audio.newMusic(Gdx.files.internal("data/music/dark_descent.mp3"))
+        music.setLooping(true)
+        music.setVolume(0.3f)
+        music.play()
       }
 
       batch.begin()
