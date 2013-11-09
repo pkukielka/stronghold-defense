@@ -1,8 +1,8 @@
 package com.pkukielka.stronghold.spell.attacks.arrow
 
 import com.badlogic.gdx.math._
-import com.pkukielka.stronghold.spell.{Attack}
-import com.pkukielka.stronghold.enemy.{PathFinder, Enemy}
+import com.pkukielka.stronghold.spell.Attack
+import com.pkukielka.stronghold.enemy.Enemy
 import com.pkukielka.stronghold.IsometricMapUtils
 import com.pkukielka.stronghold.assets.Assets
 

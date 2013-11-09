@@ -52,7 +52,7 @@ class StrongholdDefense extends Game {
 
         val inputCamController = new InputCamController(camera)
         val gestureCamController = new GestureDetector(new GestureCamController(camera, animationManager.hit))
-        Gdx.input.setInputProcessor(new InputMultiplexer(Gdx.input.getInputProcessor(), gestureCamController, inputCamController))
+        Gdx.input.setInputProcessor(new InputMultiplexer(Gdx.input.getInputProcessor, gestureCamController, inputCamController))
 
         isLoaded = true
 

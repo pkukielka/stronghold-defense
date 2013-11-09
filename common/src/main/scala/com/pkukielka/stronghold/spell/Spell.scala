@@ -7,7 +7,7 @@ import com.pkukielka.stronghold.utils.Utils
 import com.pkukielka.stronghold.Influence
 import com.pkukielka.stronghold.assets.EffectGfxAssets
 
-abstract class Spell(pathFinder: PathFinder)  {
+abstract class Spell(pathFinder: PathFinder) {
   var time = 0f
   var timeFromLastShoot = 0f
   var currentShootInterval = shootInterval
@@ -29,17 +29,17 @@ abstract class Spell(pathFinder: PathFinder)  {
     isActive = true
   }
 
-  def assets: EffectGfxAssets
+  protected def assets: EffectGfxAssets
 
-  def range: Float
+  protected def range: Float
 
-  def attack: Attack
+  protected def attack: Attack
 
-  def lifeTime: Float
+  protected def lifeTime: Float
 
-  def shootInterval: Float
+  protected def shootInterval: Float
 
-  def targetAttack(enemies: Array[Enemy], attacks: ArrayBuffer[Attack]) {
+  protected def targetAttack(enemies: Array[Enemy], attacks: ArrayBuffer[Attack]) {
     val target = Utils.minBy(enemies, enemyDistance)
     if (!target.isDead && target.position.dst(position) < range) {
       val newAttack = attack

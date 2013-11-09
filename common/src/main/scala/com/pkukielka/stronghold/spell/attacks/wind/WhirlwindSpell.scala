@@ -5,10 +5,10 @@ import com.pkukielka.stronghold.spell.{Attack, Spell}
 import com.pkukielka.stronghold.assets.Assets
 
 class WhirlwindSpell(pathFinder: PathFinder, whirlwindAttack: => Attack) extends Spell(pathFinder) {
-  val assets = Assets.spellWind2
-  val range = Whirlwind.range
-  val lifeTime = 5f
-  val shootInterval = 1f
+  override protected val assets = Assets.spellWind2
+  override protected val range = Whirlwind.range
+  override protected val lifeTime = 5f
+  override protected val shootInterval = 1f
 
-  def attack: Attack = whirlwindAttack
+  override protected def attack: Attack = whirlwindAttack
 }

@@ -5,9 +5,11 @@ import com.pkukielka.stronghold.enemy.Enemy
 import com.badlogic.gdx.math.{Bezier, Vector2}
 
 object Whirlwind {
+  val range = 5f
+  val angle = 120f
+  val attackRange = 1f
   val baseDamage = 20f
   val timeToComplete = 1.4f
-  val range = 5f
   val rotationsPerSecond = 3
 }
 
@@ -30,8 +32,8 @@ class Whirlwind extends Attack {
 
     temp.start.set(xStart, yStart)
     temp.target.set(xEnd, yEnd).sub(temp.start).nor.scl(range)
-    temp.middle.set(temp.target).div(2f).rotate(60f - (scala.math.random.toFloat * 120f)).add(temp.start)
-    temp.target.rotate(60f - (scala.math.random.toFloat * 120f)).add(temp.start)
+    temp.middle.set(temp.target).div(2f).rotate((angle * 0.5f) - (scala.math.random.toFloat * angle)).add(temp.start)
+    temp.target.rotate((angle * 0.5f) - (scala.math.random.toFloat * angle)).add(temp.start)
 
     path.set(temp.start, temp.middle, temp.target)
     position.set(temp.start)
@@ -44,7 +46,7 @@ class Whirlwind extends Attack {
       path.valueAt(position, time / timeToComplete)
       temp.delta.sub(position).scl(-1f)
 
-      for (enemy <- enemies if !enemy.isDead && enemy.position.dst(position) < 1f) {
+      for (enemy <- enemies if !enemy.isDead && enemy.position.dst(position) < attackRange) {
         enemy.hit(baseDamage * deltaTime)
         enemy.position.add(temp.delta)
         enemy.directionVector.rotate(360 * rotationsPerSecond * deltaTime)
