@@ -45,7 +45,7 @@ trait ThunderRenderer extends Renderer with Attack {
   protected def yPos = IsometricMapUtils.mapToCameraY(position) + yAdjustment
 
   override def draw(batch: SpriteBatch, deltaTime: Float): Unit = {
-    if (!isCompleted) {
+    if (isActive) {
       batch.draw(currentFrame, xPos, yPos, 0, 0, width, height, scaleX, 1f, 0)
     }
   }

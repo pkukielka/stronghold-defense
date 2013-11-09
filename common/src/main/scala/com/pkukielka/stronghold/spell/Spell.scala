@@ -4,29 +4,24 @@ import com.badlogic.gdx.math.Vector2
 import scala.collection.mutable.ArrayBuffer
 import com.pkukielka.stronghold.enemy.{Enemy, PathFinder}
 import com.pkukielka.stronghold.utils.Utils
-import com.pkukielka.stronghold.Influence
+import com.pkukielka.stronghold.{Lifecycle, Influence}
 import com.pkukielka.stronghold.assets.EffectGfxAssets
 
-abstract class Spell(pathFinder: PathFinder) {
-  var time = 0f
+abstract class Spell(pathFinder: PathFinder) extends Lifecycle {
   var timeFromLastShoot = 0f
   var currentShootInterval = shootInterval
   var deactivated = false
   var influence: Influence = null
   val position = new Vector2()
 
-  pathFinder.update
-
-  protected var isActive = false
-
   private val enemyDistance = (enemy: Enemy) => if (enemy.isDead) Int.MaxValue else enemy.position.dst(position)
 
   def init(positionX: Float, positionY: Float) = {
-    time = 0f
+    activate()
     timeFromLastShoot = 0f
     position.set(positionX, positionY)
-    influence = pathFinder.influencesManager.add(10000f, position, 1000, 500, range)
-    isActive = true
+    influence = pathFinder.influencesManager.add(10000f, position, 1000, 1000, range)
+    pathFinder.update
   }
 
   protected def assets: EffectGfxAssets
@@ -34,8 +29,6 @@ abstract class Spell(pathFinder: PathFinder) {
   protected def range: Float
 
   protected def attack: Attack
-
-  protected def lifeTime: Float
 
   protected def shootInterval: Float
 
@@ -48,10 +41,15 @@ abstract class Spell(pathFinder: PathFinder) {
     }
   }
 
-  def update(deltaTime: Float, enemies: Array[Enemy], attacks: ArrayBuffer[Attack]) {
-    time += deltaTime
+  override def deactivate() {
+    super.deactivate()
+    pathFinder.influencesManager.remove(influence)
+    influence = null
+  }
 
-    if (time < lifeTime) {
+  def update(deltaTime: Float, enemies: Array[Enemy], attacks: ArrayBuffer[Attack]) {
+    if (advanceTime(deltaTime))
+    {
       timeFromLastShoot += deltaTime
 
       if (timeFromLastShoot > currentShootInterval) {
@@ -59,11 +57,6 @@ abstract class Spell(pathFinder: PathFinder) {
         currentShootInterval = shootInterval
         targetAttack(enemies, attacks)
       }
-    }
-    else if (isActive) {
-      isActive = false
-      pathFinder.influencesManager.remove(influence)
-      influence = null
     }
   }
 }

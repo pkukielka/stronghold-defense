@@ -4,25 +4,28 @@ import com.badlogic.gdx.math.{Intersector, Vector2}
 import scala.language.implicitConversions
 
 abstract class EnemyCore(pathFinder: PathFinder) extends Enemy {
-  var animationTime = scala.math.random.toFloat
-  val baseSize = (1.0f - (scala.math.random * 0.2f)).toFloat
-  val xOffset = (0.5f + (scala.math.random - 0.5f) / 4).toFloat
-  val yOffset = (0.5f + (scala.math.random - 0.5f) / 4).toFloat
+  protected var life = maxLife
+  protected val baseSize = (1.0f - (scala.math.random * 0.2f)).toFloat
+  protected val xOffset = (0.5f + (scala.math.random - 0.5f) / 4).toFloat
+  protected val yOffset = (0.5f + (scala.math.random - 0.5f) / 4).toFloat
   val position = pathFinder.getFreePosition.add(xOffset, yOffset)
   val directionVector = new Vector2()
-  var life = maxLife
   var isHold = false
+
+  advanceTime(scala.math.random.toFloat)
 
   object temp {
     val p1, p2, intersection = new Vector2()
   }
+
+  override protected def lifeTime = Float.MaxValue
 
   override def width: Float = baseSize
 
   override def height: Float = baseSize
 
   override def die() {
-    animationTime = 0
+    resetTime()
   }
 
   override def harm(damage: Float) {
@@ -55,15 +58,13 @@ abstract class EnemyCore(pathFinder: PathFinder) extends Enemy {
   }
 
   override def update(deltaTime: Float) {
-    if (deltaTime < 0.10) {
-      animationTime += deltaTime
+    advanceTime(deltaTime)
 
-      if (!isDead) {
-        move(deltaTime)
-      }
-
-      isHold = false
+    if (!isDead) {
+      move(deltaTime)
     }
+
+    isHold = false
   }
 
   protected def maxLife: Float = 100f // TODO: set in base classes

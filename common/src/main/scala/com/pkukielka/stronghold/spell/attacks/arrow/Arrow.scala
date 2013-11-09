@@ -22,7 +22,6 @@ class Arrow extends Attack {
   protected val direction: Vector2 = new Vector2()
   private var heightsDifference: Float = 0f
   private val path = new Bezier[Vector2]
-  private var time = 0f
   private var timeToComplete = 0f
 
   object temp {
@@ -33,7 +32,11 @@ class Arrow extends Attack {
 
   import Arrow._
 
+  override protected def lifeTime = timeToComplete
+
   def init(xStart: Float, yStart: Float, xEnd: Float, yEnd: Float, heightsDifference: Float) {
+    activate()
+
     position.set(IsometricMapUtils.mapToCameraX(xStart, yStart), IsometricMapUtils.mapToCameraY(xStart, yStart))
     temp.target.set(IsometricMapUtils.mapToCameraX(xEnd, yEnd), IsometricMapUtils.mapToCameraY(xEnd, yEnd))
     this.heightsDifference = heightsDifference
@@ -51,8 +54,6 @@ class Arrow extends Attack {
     timeToComplete = distance / velocity
   }
 
-  def isCompleted = time == timeToComplete
-
   private def updatePosition() = {
     previousPosition.set(position)
     path.valueAt(position, time / timeToComplete)
@@ -69,10 +70,14 @@ class Arrow extends Attack {
   }
 
   def update(deltaTime: Float, enemies: Array[Enemy]) {
-    if (!isCompleted) {
+    if (isActive) {
       time = (time + deltaTime).min(timeToComplete)
       updatePosition()
       updateWorldState(enemies)
+    }
+
+    if (time >= timeToComplete) {
+      deactivate()
     }
   }
 }

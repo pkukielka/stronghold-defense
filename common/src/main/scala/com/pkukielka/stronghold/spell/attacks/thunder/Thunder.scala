@@ -8,7 +8,6 @@ import com.pkukielka.stronghold.enemy.features.flammable.Flammable
 object Thunder {
   def damage = 20f + (60f * scala.math.random.toFloat)
 
-  val timeToComplete = 1f
   val initialDelay = 0.2f
   val range = 1f
 
@@ -20,19 +19,17 @@ object Thunder {
 class Thunder extends Attack {
   protected val position: Vector2 = new Vector2()
   protected var alreadyShoot = false
-  protected var time = 0f
+  override protected val lifeTime: Float = 1f
 
   import Thunder._
 
   override def init(xStart: Float, yStart: Float, xEnd: Float, yEnd: Float, heightsDifference: Float) {
-    time = 0f
+    activate()
     position.set(xStart, yStart)
   }
 
   override def update(deltaTime: Float, enemies: Array[Enemy]): Unit = {
-    if (!isCompleted) {
-      time = (time + deltaTime).min(timeToComplete)
-
+    if (advanceTime(deltaTime)) {
       if (!alreadyShoot && time > initialDelay) {
         alreadyShoot = true
 
@@ -49,6 +46,4 @@ class Thunder extends Attack {
       }
     }
   }
-
-  override def isCompleted: Boolean = time == timeToComplete
 }

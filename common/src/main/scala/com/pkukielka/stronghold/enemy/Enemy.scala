@@ -1,9 +1,10 @@
 package com.pkukielka.stronghold.enemy
 
 import com.pkukielka.stronghold.assets.EnemyAssets
+import com.pkukielka.stronghold.Lifecycle
 import com.badlogic.gdx.math.Vector2
 
-trait Enemy {
+trait Enemy extends Lifecycle {
   def position: Vector2
 
   var isHold: Boolean

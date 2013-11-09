@@ -20,13 +20,13 @@ trait ArrowRenderer extends com.pkukielka.stronghold.Renderer {
   override def depth = position.y
 
   override def draw(batch: SpriteBatch, deltaTime: Float): Unit = {
-    if (isCompleted) {
-      batch.draw(arrow_broken_sprite, position.x, position.y, 0, 0,
-        arrow_broken_sprite.getWidth, arrow_broken_sprite.getHeight, spriteScale, spriteScale, angle)
-    }
-    else {
+    if (isActive) {
       batch.draw(arrow_sprite, position.x, position.y, 0, 0,
         arrow_sprite.getWidth, arrow_sprite.getHeight, spriteScale, spriteScale, angle)
+    }
+    else {
+      batch.draw(arrow_broken_sprite, position.x, position.y, 0, 0,
+        arrow_broken_sprite.getWidth, arrow_broken_sprite.getHeight, spriteScale, spriteScale, angle)
     }
   }
 }

@@ -78,10 +78,10 @@ class AnimationManager(batch: SpriteBatch, camera: OrthographicCamera, map: Tile
   private val updateEnemy = (enemy: Enemy) => enemy.update(delta)
   private val updateAttacks = (attack: Attack) => attack.update(delta, enemies.asInstanceOf[Array[Enemy]])
   private val updateSpells = (spell: Spell) => spell.update(delta, enemies.asInstanceOf[Array[Enemy]], attacks.asInstanceOf[ArrayBuffer[Attack]])
-  private val renderCompletedAttacks = (attack: Attack) => if (attack.isCompleted) attack.asInstanceOf[Renderer].draw(batch, delta)
+  private val renderCompletedAttacks = (attack: Attack) => if (attack.isActive) attack.asInstanceOf[Renderer].draw(batch, delta)
   private val isDeadEnemy = (renderer: Renderer) => renderer.isInstanceOf[Enemy] && renderer.asInstanceOf[Enemy].isDead
   private val renderDeadEnemies = (renderer: Renderer) => if (isDeadEnemy(renderer)) renderer.draw(batch, delta)
-  private val renderAttacksInProgress = (attack: Attack) => if (!attack.isCompleted) attack.asInstanceOf[Renderer].draw(batch, delta)
+  private val renderAttacksInProgress = (attack: Attack) => if (!attack.isActive) attack.asInstanceOf[Renderer].draw(batch, delta)
   private val renderLifeBar = (enemy: Enemy) => enemy.asInstanceOf[EnemyRenderer].drawLifeBar(shapeRenderer)
   private val renderLivingEnemiesAndSpells = (renderer: Renderer) => if (!isDeadEnemy(renderer)) renderer.draw(batch, delta)
 

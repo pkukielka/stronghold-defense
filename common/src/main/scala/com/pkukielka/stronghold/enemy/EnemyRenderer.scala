@@ -47,10 +47,10 @@ trait EnemyRenderer extends Enemy with com.pkukielka.stronghold.Renderer {
 
   protected def currentFrame: TextureRegion = {
     if (isDead) {
-      assets.gfx.dieAnimations(angle).getKeyFrame(animationTime, false)
+      assets.gfx.dieAnimations(angle).getKeyFrame(time, false)
     }
     else {
-      assets.gfx.moveAnimations(angle).getKeyFrame(animationTime, true)
+      assets.gfx.moveAnimations(angle).getKeyFrame(time, true)
     }
   }
 

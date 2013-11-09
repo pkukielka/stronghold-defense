@@ -14,7 +14,7 @@ trait WhirlwindRenderer extends Renderer with Attack {
   self: Whirlwind =>
 
   def draw(batch: SpriteBatch, deltaTime: Float): Unit = {
-    if (!isCompleted) {
+    if (isActive) {
       val frame = Assets.spellWind3.effectAnimation.getKeyFrame(time, false)
       batch.draw(frame, IsometricMapUtils.mapToCameraX(position) - 0.5f, IsometricMapUtils.mapToCameraY(position) - 0.5f,
         frame.getRegionWidth * IsometricMapUtils.unitScale, frame.getRegionHeight * IsometricMapUtils.unitScale)

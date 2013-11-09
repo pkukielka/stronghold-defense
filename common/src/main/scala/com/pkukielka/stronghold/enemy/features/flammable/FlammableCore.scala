@@ -6,8 +6,6 @@ trait FlammableCore extends Enemy with Flammable {
   var timeLeft = 0f
   var damagePerSecond = 0f
 
-  protected def isActive = timeLeft > 0
-
   override def setOnFire(timeLeft: Float, damagePerSecond: Float) {
     this.timeLeft = timeLeft
     this.damagePerSecond = damagePerSecond
@@ -16,7 +14,7 @@ trait FlammableCore extends Enemy with Flammable {
   abstract override def update(deltaTime: Float) {
     super.update(deltaTime)
 
-    if (isActive) {
+    if (timeLeft > 0) {
       timeLeft -= deltaTime
       hit(deltaTime * damagePerSecond)
     }

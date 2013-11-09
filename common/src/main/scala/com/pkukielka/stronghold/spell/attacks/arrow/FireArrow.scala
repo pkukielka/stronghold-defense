@@ -20,7 +20,7 @@ class FireArrow extends Arrow {
       fireEffect.update(deltaTime)
     }
 
-    if (!isCompleted) {
+    if (isActive) {
       temp.p1.set(IsometricMapUtils.cameraToMapX(previousPosition), IsometricMapUtils.cameraToMapY(previousPosition))
       temp.p2.set(IsometricMapUtils.cameraToMapX(position), IsometricMapUtils.cameraToMapY(position))
       for (enemy <- enemies if !enemy.isDead && enemy.isInstanceOf[FlammableCore] && enemy.isHit(temp.p1, temp.p2)) {
