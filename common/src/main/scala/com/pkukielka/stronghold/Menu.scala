@@ -31,11 +31,16 @@ class Menu {
   val lightButton = addNewButton("light/lightning")
   val mindButton = addNewButton("mind/revive")
 
+  var activeButton = airButton
+  activeButton.toggle()
+
   val buttons = List(airButton, earthButton, fireButton, lightButton, mindButton)
   buttons.foreach { button=>
     button.addListener(new ChangeListener() {
       def changed(event: ChangeEvent, actor: Actor) {
         click.play()
+
+        activeButton = button
 
         buttons.filter(_ != button).foreach { b =>
           if (b.isChecked) {
