@@ -32,12 +32,11 @@ abstract class Spell(pathFinder: PathFinder) extends Lifecycle {
 
   protected def shootInterval: Float
 
-  protected def targetAttack(enemies: Array[Enemy], attacks: ArrayBuffer[Attack]) {
+  protected def targetAttack(enemies: Array[Enemy]) {
     val target = Utils.minBy(enemies, enemyDistance)
     if (!target.isDead && target.position.dst(position) < range) {
       val newAttack = attack
       newAttack.init(position.x, position.y, target.position.x, target.position.y, 0)
-      attacks += newAttack
     }
   }
 
@@ -47,7 +46,7 @@ abstract class Spell(pathFinder: PathFinder) extends Lifecycle {
     influence = null
   }
 
-  def update(deltaTime: Float, enemies: Array[Enemy], attacks: ArrayBuffer[Attack]) {
+  def update(deltaTime: Float, enemies: Array[Enemy]) {
     if (advanceTime(deltaTime))
     {
       timeFromLastShoot += deltaTime
@@ -55,7 +54,7 @@ abstract class Spell(pathFinder: PathFinder) extends Lifecycle {
       if (timeFromLastShoot > currentShootInterval) {
         timeFromLastShoot -= currentShootInterval
         currentShootInterval = shootInterval
-        targetAttack(enemies, attacks)
+        targetAttack(enemies)
       }
     }
   }

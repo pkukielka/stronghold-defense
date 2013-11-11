@@ -4,105 +4,54 @@ import scala.collection.mutable.ArrayBuffer
 
 object Sorting {
 
-  def sort[T <: Ordered[T]](x: ArrayBuffer[T], off: Int, len: Int) {
+  def swap[T](xs: ArrayBuffer[T], a: Int, b: Int) {
+    val t = xs(a)
+    xs(a) = xs(b)
+    xs(b) = t
+  }
 
-    def swap(a: Int, b: Int) {
-      val t = x(a)
-      x(a) = x(b)
-      x(b) = t
+  def partition[T](xs: ArrayBuffer[T], lo: Int, hi: Int, predicate: T => Boolean): Int = {
+    var first = lo
+    var last = hi
+    while (first != last) {
+      while (predicate(xs(first))) {
+        first += 1
+        if (first == last) return first
+      }
+      do {
+        last -= 1
+        if (first == last) return first
+      } while (!predicate(xs(last)))
+
+      swap(xs, first, last)
+      first += 1
     }
-    def vecswap(_a: Int, _b: Int, n: Int) {
-      var a = _a
-      var b = _b
-      var i = 0
-      while (i < n) {
-        swap(a, b)
-        i += 1
-        a += 1
-        b += 1
+
+    return first
+  }
+
+  def stableSort[K](a: ArrayBuffer[K], lo: Int, hi: Int, scratch: ArrayBuffer[K], f: K => Float) {
+    if (lo < hi) {
+      val mid = (lo+hi) / 2
+      stableSort(a, lo, mid, scratch, f)
+      stableSort(a, mid+1, hi, scratch, f)
+      var k, t_lo = lo
+      var t_hi = mid + 1
+      while (k <= hi) {
+        if ((t_lo <= mid) && ((t_hi > hi) || f(a(t_hi)) <= f(a(t_lo)))) {
+          scratch(k) = a(t_lo)
+          t_lo += 1
+        } else {
+          scratch(k) = a(t_hi)
+          t_hi += 1
+        }
+        k += 1
+      }
+      k = lo
+      while (k <= hi) {
+        a(k) = scratch(k)
+        k += 1
       }
     }
-    def med3(a: Int, b: Int, c: Int) = {
-      if (x(a) < x(b)) {
-        if (x(b) < x(c)) b else if (x(a) < x(c)) c else a
-      } else {
-        if (x(b) > x(c)) b else if (x(a) > x(c)) c else a
-      }
-    }
-    def sort2(off: Int, len: Int) {
-      // Insertion sort on smallest arrays
-      if (len < 7) {
-        var i = off
-        while (i < len + off) {
-          var j = i
-          while (j > off && x(j-1) > x(j)) {
-            swap(j, j-1)
-            j -= 1
-          }
-          i += 1
-        }
-      } else {
-        // Choose a partition element, v
-        var m = off + (len >> 1)        // Small arrays, middle element
-        if (len > 7) {
-          var l = off
-          var n = off + len - 1
-          if (len > 40) {        // Big arrays, pseudomedian of 9
-          val s = len / 8
-            l = med3(l, l+s, l+2*s)
-            m = med3(m-s, m, m+s)
-            n = med3(n-2*s, n-s, n)
-          }
-          m = med3(l, m, n) // Mid-size, med of 3
-        }
-        val v = x(m)
-
-        // Establish Invariant: v* (<v)* (>v)* v*
-        var a = off
-        var b = a
-        var c = off + len - 1
-        var d = c
-        var done = false
-        while (!done) {
-          while (b <= c && x(b) <= v) {
-            if (x(b) == v) {
-              swap(a, b)
-              a += 1
-            }
-            b += 1
-          }
-          while (c >= b && x(c) >= v) {
-            if (x(c) == v) {
-              swap(c, d)
-              d -= 1
-            }
-            c -= 1
-          }
-          if (b > c) {
-            done = true
-          } else {
-            swap(b, c)
-            c -= 1
-            b += 1
-          }
-        }
-
-        // Swap partition elements back to middle
-        val n = off + len
-        var s = math.min(a-off, b-a)
-        vecswap(off, b-s, s)
-        s = math.min(d-c, n-d-1)
-        vecswap(b,   n-s, s)
-
-        // Recursively sort non-partition-elements
-        s = b - a
-        if (s > 1)
-          sort2(off, s)
-        s = d - c
-        if (s > 1)
-          sort2(n-s, s)
-      }
-    }
-    sort2(off, len)
   }
 }

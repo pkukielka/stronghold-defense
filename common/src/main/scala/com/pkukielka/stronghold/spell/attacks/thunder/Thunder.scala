@@ -6,8 +6,6 @@ import com.pkukielka.stronghold.spell.Attack
 import com.pkukielka.stronghold.enemy.features.flammable.Flammable
 
 object Thunder {
-  def damage = 20f + (60f * scala.math.random.toFloat)
-
   val initialDelay = 0.2f
   val range = 1f
 
@@ -23,8 +21,11 @@ class Thunder extends Attack {
 
   import Thunder._
 
+  protected def damage = 20f + (60f * scala.math.random.toFloat)
+
   override def init(xStart: Float, yStart: Float, xEnd: Float, yEnd: Float, heightsDifference: Float) {
     activate()
+    alreadyShoot = false
     position.set(xStart, yStart)
   }
 

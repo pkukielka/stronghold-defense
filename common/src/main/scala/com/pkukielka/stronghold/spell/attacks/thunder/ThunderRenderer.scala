@@ -1,7 +1,7 @@
 package com.pkukielka.stronghold.spell.attacks.thunder
 
 import com.pkukielka.stronghold.{IsometricMapUtils, Renderer}
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.{Animation, SpriteBatch}
 import com.pkukielka.stronghold.assets.Assets
 import com.pkukielka.stronghold.spell.Attack
 import com.badlogic.gdx.Gdx
@@ -22,7 +22,7 @@ trait ThunderRenderer extends Renderer with Attack {
 
   val flipped = scala.util.Random.nextBoolean()
 
-  val animation = if (scala.util.Random.nextBoolean()) Assets.spellThunder1.effectAnimation else Assets.spellThunder2.effectAnimation
+  var animation: Animation = _
 
   protected def currentFrame = animation.getKeyFrame(time, false)
 
@@ -52,6 +52,7 @@ trait ThunderRenderer extends Renderer with Attack {
 
   override abstract def init(xStart: Float, yStart: Float, xEnd: Float, yEnd: Float, heightsDifference: Float) {
     super.init(xStart, yStart, xEnd, yEnd, heightsDifference)
+    animation = if (scala.util.Random.nextBoolean()) Assets.spellThunder1.effectAnimation else Assets.spellThunder2.effectAnimation
     ThunderRenderer.sound.play()
   }
 

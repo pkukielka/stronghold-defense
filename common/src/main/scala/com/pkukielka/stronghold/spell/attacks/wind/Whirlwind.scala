@@ -30,7 +30,7 @@ class Whirlwind extends Attack {
     activate()
     temp.start.set(xStart, yStart)
     temp.target.set(xEnd, yEnd).sub(temp.start).nor.scl(range)
-    temp.target.sub(temp.start).nor.scl(range)
+
     temp.middle.set(temp.target).div(2f).rotate((angle * 0.5f) - (scala.math.random.toFloat * angle)).add(temp.start)
     temp.target.rotate((angle * 0.5f) - (scala.math.random.toFloat * angle)).add(temp.start)
 
@@ -53,6 +53,12 @@ class Whirlwind extends Attack {
         enemy.directionVector.rotate(360 * rotationsPerSecond * deltaTime)
         enemy.isHold = true
         return
+      }
+
+      temp.delta.scl(0.1f)
+      for (enemy <- enemies if enemy.isDead && enemy.position.dst(position) < attackRange) {
+        enemy.position.add(temp.delta)
+        enemy.directionVector.rotate(30 * rotationsPerSecond * deltaTime)
       }
     }
   }

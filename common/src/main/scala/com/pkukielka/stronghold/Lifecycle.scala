@@ -6,6 +6,7 @@ case object Freed extends LifecycleState
 
 trait Lifecycle {
   private var state: LifecycleState = Active
+  var cleanup = () => {}
   var time = 0.0f
 
   protected def lifeTime: Float
@@ -17,10 +18,11 @@ trait Lifecycle {
 
   def deactivate() {
     state = Freed
+    cleanup()
   }
 
   def resetTime() {
-    time = 0f
+    time = 0.0f
   }
 
   def advanceTime(t: Float): Boolean = {

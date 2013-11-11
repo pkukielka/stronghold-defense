@@ -22,36 +22,38 @@ class AnimationManager(batch: SpriteBatch, camera: OrthographicCamera, map: Tile
   private val fog = new Texture(Gdx.files.internal("data/textures/fog.png"))
   private val shapeRenderer = new ShapeRenderer()
   private val mapBuilder = new MapBuilder(map)
-  private val attacks = ArrayBuffer.empty[Attack with Renderer]
-  private val spells = ArrayBuffer.empty[Spell with Renderer]
   private var delta = 0.0f
+  private var loopCounter = 0
+
+  private val sceneObjects = ArrayBuffer.empty[Lifecycle with Renderer]
+  private val helperBuffer = ArrayBuffer.fill[Lifecycle with Renderer](1000)(null)
 
   private implicit val influencesManager = new InfluencesManager(mapBuilder.width, mapBuilder.height)
   private implicit val pathFinder = new PathFinder(mapBuilder.getNode(7, 29), mapBuilder, influencesManager)
 
-  object Pools {
-    val whirlwindAttack = new Pool[Whirlwind with WhirlwindRenderer] {
-      def newObject() = new Whirlwind with WhirlwindRenderer with Poolable[Whirlwind with WhirlwindRenderer]
-    }
-    val whirlwindSpell =new Pool[WhirlwindSpell with SpellRenderer] {
-      def newObject() = new WhirlwindSpell(pathFinder, whirlwindAttack.obtain()) with SpellRenderer with Poolable[WhirlwindSpell with SpellRenderer]
-    }
+  pathFinder.update
 
-    val thunderAttack = new Pool[Thunder with ThunderRenderer] {
-      def newObject() = new Thunder with ThunderRenderer with Poolable[Thunder with ThunderRenderer]
-    }
-    val thunderSpell = new Pool[ThunderSpell with SpellRenderer] {
-      def newObject() = new ThunderSpell(pathFinder, thunderAttack.obtain()) with SpellRenderer with Poolable[ThunderSpell with SpellRenderer]
+  class PoolWrapper[T <: Lifecycle with Renderer](create: => T) extends Pool[T] {
+    def newObject(): T = {
+      val obj = create
+      obj.cleanup = () => free(obj)
+      sceneObjects += obj
+      obj
     }
   }
 
-  pathFinder.update
+  object Pools {
+    val whirlwindAttack = new PoolWrapper(new Whirlwind with WhirlwindRenderer with Poolable[Whirlwind with WhirlwindRenderer])
+    val whirlwindSpell = new PoolWrapper(new WhirlwindSpell(pathFinder, whirlwindAttack.obtain()) with SpellRenderer with Poolable[WhirlwindSpell with SpellRenderer])
+    val thunderAttack = new PoolWrapper(new Thunder with ThunderRenderer with Poolable[Thunder with ThunderRenderer])
+    val thunderSpell = new PoolWrapper(new ThunderSpell(pathFinder, thunderAttack.obtain()) with SpellRenderer with Poolable[ThunderSpell with SpellRenderer])
+  }
 
   trait DefaultExtensions extends FlammableCore with EnemyRenderer with FlammableRenderer {
     self: EnemyCore =>
   }
 
-  private val enemies: Array[Enemy with Renderer] = ArrayBuffer.fill(10)(Array(
+  private val enemies: Array[Enemy with EnemyRenderer] = ArrayBuffer.fill(10)(Array(
     new Skeleton with DefaultExtensions, new SkeletonArcher with DefaultExtensions,
     new SkeletonMage with DefaultExtensions, new SkeletonWeak with DefaultExtensions,
     new Goblin with DefaultExtensions, new EliteGoblin with DefaultExtensions,
@@ -61,7 +63,7 @@ class AnimationManager(batch: SpriteBatch, camera: OrthographicCamera, map: Tile
     new WyvernAir with DefaultExtensions, new WyvernEarth with DefaultExtensions
   )).flatten.toArray
 
-  var renderers: ArrayBuffer[Renderer] = enemies.map(_.asInstanceOf[Renderer]).to[ArrayBuffer]
+  sceneObjects ++= enemies
 
   def hit(x: Float, y: Float) {
     val spell = menu.activeButton match {
@@ -71,41 +73,44 @@ class AnimationManager(batch: SpriteBatch, camera: OrthographicCamera, map: Tile
     }
 
     spell.init(IsometricMapUtils.cameraToMapX(x, y), IsometricMapUtils.cameraToMapY(x, y))
-    spells += spell
-    renderers += spell
   }
 
-  private val updateEnemy = (enemy: Enemy) => enemy.update(delta)
-  private val updateAttacks = (attack: Attack) => attack.update(delta, enemies.asInstanceOf[Array[Enemy]])
-  private val updateSpells = (spell: Spell) => spell.update(delta, enemies.asInstanceOf[Array[Enemy]], attacks.asInstanceOf[ArrayBuffer[Attack]])
-  private val renderCompletedAttacks = (attack: Attack) => if (attack.isActive) attack.asInstanceOf[Renderer].draw(batch, delta)
-  private val isDeadEnemy = (renderer: Renderer) => renderer.isInstanceOf[Enemy] && renderer.asInstanceOf[Enemy].isDead
-  private val renderDeadEnemies = (renderer: Renderer) => if (isDeadEnemy(renderer)) renderer.draw(batch, delta)
-  private val renderAttacksInProgress = (attack: Attack) => if (!attack.isActive) attack.asInstanceOf[Renderer].draw(batch, delta)
-  private val renderLifeBar = (enemy: Enemy) => enemy.asInstanceOf[EnemyRenderer].drawLifeBar(shapeRenderer)
-  private val renderLivingEnemiesAndSpells = (renderer: Renderer) => if (!isDeadEnemy(renderer)) renderer.draw(batch, delta)
+  private val drawLifeBar = (enemy: Enemy with EnemyRenderer) => enemy.drawLifeBar(shapeRenderer)
+
+  private val isDeadEnemy = (obj: Lifecycle with Renderer) => obj match {
+    case e: Enemy => e.isDead
+    case _ => false
+  }
+
+  private val draw = (obj: Renderer) => obj.draw(batch, delta)
+
+  private val update = (obj: Lifecycle with Renderer) => obj match {
+    case enemy: Enemy => enemy.update(delta)
+    case spell: Spell => spell.update(delta, enemies.asInstanceOf[Array[Enemy]])
+    case attack: Attack => attack.update(delta, enemies.asInstanceOf[Array[Enemy]])
+  }
 
   def update(deltaTime: Float) {
     delta = deltaTime
+    loopCounter += 1
 
-    influencesManager.update(delta)
+    if (loopCounter % 3 == 0)
+    {
+      val partitionActive = Sorting.partition[Lifecycle with Renderer](sceneObjects, 0, sceneObjects.length - 1, _.isActive)
+      val partitionDeadEnemies = Sorting.partition[Lifecycle with Renderer](sceneObjects, 0, partitionActive - 1, isDeadEnemy)
+      Sorting.stableSort[Enemy](sceneObjects.asInstanceOf[ArrayBuffer[Enemy]], 0, partitionDeadEnemies - 1, helperBuffer.asInstanceOf[ArrayBuffer[Enemy]], _.time)
+      Sorting.stableSort[Lifecycle with Renderer](sceneObjects, partitionDeadEnemies, partitionActive - 1, helperBuffer, _.depth)
+    }
 
-    Sorting.sort(renderers, 0, renderers.length)
-
-    enemies.foreach(updateEnemy)
-    attacks.foreach(updateAttacks)
-    spells.foreach(updateSpells)
+    sceneObjects foreach update
 
     batch.begin()
-    attacks.foreach(renderCompletedAttacks)
-    renderers.foreach(renderDeadEnemies)
-    renderers.foreach(renderLivingEnemiesAndSpells)
-    attacks.foreach(renderAttacksInProgress)
+    sceneObjects foreach draw
     batch.end()
 
     shapeRenderer.setProjectionMatrix(camera.combined)
     shapeRenderer.begin(ShapeType.Filled)
-    enemies.foreach(renderLifeBar)
+    enemies.foreach(drawLifeBar)
     shapeRenderer.end()
 
     // Hackish fog of war
