@@ -91,18 +91,22 @@ class AnimationManager(batch: SpriteBatch, camera: OrthographicCamera, map: Tile
   }
 
   def update(deltaTime: Float) {
-    delta = deltaTime
-    loopCounter += 1
 
-    if (loopCounter % 3 == 0)
+    if (deltaTime < 0.1f)
     {
-      val partitionActive = Sorting.partition[Lifecycle with Renderer](sceneObjects, 0, sceneObjects.length - 1, _.isActive)
-      val partitionDeadEnemies = Sorting.partition[Lifecycle with Renderer](sceneObjects, 0, partitionActive - 1, isDeadEnemy)
-      Sorting.stableSort[Enemy](sceneObjects.asInstanceOf[ArrayBuffer[Enemy]], 0, partitionDeadEnemies - 1, helperBuffer.asInstanceOf[ArrayBuffer[Enemy]], _.time)
-      Sorting.stableSort[Lifecycle with Renderer](sceneObjects, partitionDeadEnemies, partitionActive - 1, helperBuffer, _.depth)
-    }
+      delta = deltaTime
+      loopCounter += 1
 
-    sceneObjects foreach update
+      if (loopCounter % 3 == 0)
+      {
+        val partitionActive = Sorting.partition[Lifecycle with Renderer](sceneObjects, 0, sceneObjects.length - 1, _.isActive)
+        val partitionDeadEnemies = Sorting.partition[Lifecycle with Renderer](sceneObjects, 0, partitionActive - 1, isDeadEnemy)
+        Sorting.stableSort[Enemy](sceneObjects.asInstanceOf[ArrayBuffer[Enemy]], 0, partitionDeadEnemies - 1, helperBuffer.asInstanceOf[ArrayBuffer[Enemy]], _.time)
+        Sorting.stableSort[Lifecycle with Renderer](sceneObjects, partitionDeadEnemies, partitionActive - 1, helperBuffer, _.depth)
+      }
+
+      sceneObjects foreach update
+    }
 
     batch.begin()
     sceneObjects foreach draw

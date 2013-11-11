@@ -7,7 +7,7 @@ import scala.collection.mutable.ArrayBuffer
 class ThunderSpell(pathFinder: PathFinder, thunderAttack: => Attack) extends Spell(pathFinder) {
   override protected val assets = null
   override protected val range = Thunder.range
-  override protected val lifeTime = 0.5f
+  override protected val lifeTime = 0.7f
 
   override protected def shootInterval = 0.1f + (scala.math.random * 0.2f).toFloat
 
