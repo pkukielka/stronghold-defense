@@ -44,7 +44,7 @@ object Settings {
       // Scala
     {
       // Declare names.
-      val baseUrl = "http://www.scala-lang.org/downloads/distrib/files"
+      val baseUrl = "http://www.scala-lang.org/files/archive/"
       val zipName = "scala-2.10.1.zip"
 
       // Fetch the scala file.
