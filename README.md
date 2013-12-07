@@ -1,6 +1,8 @@
 Stronghold Defense
 ==================
 
+![Screenshot](http://oi39.tinypic.com/x54ncy.jpg)
+
 Experiment to build realtime android game fully in scala.
 I would say I'm quite happy with the result even if there were some difficulties.
 Two biggest ones:
