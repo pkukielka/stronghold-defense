@@ -1,11 +1,18 @@
 Stronghold Defense
 ==================
 
-Build your own stronghold and defend against hordes of monsters.  
-It's yet another tower defense clone if you didn't guessed already :)
+Experiment to build realtime android game fully in scala.
+I would say I'm quite happy with the result even if there were some difficulties.
+Two biggest ones:
+- Garbage collector (this is problematic also in java, but it limit idomatic scala usage and thus hurt me even more).
+- Big scala runtime and amount of generated interfaces. You need to use proguard to strip output jars. Thankfully to libgdx this is partially mitigated.
 
-What makes it slightly different is the focus on building complete  
-fortified stronghold rather than single independent towers.
+Since recently I feel a bit bored and want to do something else than gamedev I decided to open source what I did so far. I think all assets execept loading screen are fully open sourced and you can use them even commercially (but I cannot guarantee that and I don't hold any rights for them).
+All monster models comes from Flare (great source of assets!). Other assets are taken from http://opengameart.org/ and http://mrbubblewand.wordpress.com/ (spell and effects).
+
+Code is distributed under Apache 2 License.
+
+If you will build something usefull based on this - let me know, I'm curious! ;)
 
 Target platforms for now: desktop (Windows/Linux/Mac OS X) + Android (which is main focus).
 
@@ -31,4 +38,5 @@ Edit .idea_modules/android.imf file and change PROGUARD_CFG_PATH value to "/../a
 
 Gameplay
 ------
-![alt text](http://oi44.tinypic.com/adzq55.jpg "Screenshoot")
+Right now 2 wepons are available: lighting and whirlwind. You can see both of them here:
+![alt text](http://i.minus.com/ic0JMJeABN5km.gif "Gameplay")
