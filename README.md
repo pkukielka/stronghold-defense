@@ -39,4 +39,4 @@ Edit .idea_modules/android.imf file and change PROGUARD_CFG_PATH value to "/../a
 Gameplay
 ------
 Right now 2 wepons are available: lighting and whirlwind. You can see both of them here:
-![alt text](http://i.minus.com/ic0JMJeABN5km.gif "Gameplay")
+http://i.minus.com/ic0JMJeABN5km.gif
